@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EMS", "EMS.csproj", "{973B8BD6-AA4C-4AE1-9D67-4DBFDE4090F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Models", "Models", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Employee.cs = Employee.cs
+		Notification.cs = Notification.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ViewModels", "ViewModels", "{09AA5C7A-A330-4AA8-A83E-39DD491CB382}"
+	ProjectSection(SolutionItems) = preProject
+		BirthdayViewModel.cs = BirthdayViewModel.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{973B8BD6-AA4C-4AE1-9D67-4DBFDE4090F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{973B8BD6-AA4C-4AE1-9D67-4DBFDE4090F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{973B8BD6-AA4C-4AE1-9D67-4DBFDE4090F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{973B8BD6-AA4C-4AE1-9D67-4DBFDE4090F2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E069E16-86CC-4C81-8A1A-6FC600A6E3E5}
+	EndGlobalSection
+EndGlobal
