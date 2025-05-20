@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
+using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 using EMS.Models;
 
 namespace EMS
@@ -7,15 +9,32 @@ namespace EMS
     public class MongoDbContext
     {
         private readonly IMongoDatabase _database;
+        private readonly DatabaseSeeder _seeder;
 
-        public MongoDbContext(IConfiguration configuration)
+        public MongoDbContext(IOptions<MongoDbSettings> settings)
         {
-            var settings = configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
-            var client = new MongoClient(settings.ConnectionString);
-            _database = client.GetDatabase(settings.DatabaseName);
+            var client = new MongoClient(settings.Value.ConnectionString);
+            _database = client.GetDatabase(settings.Value.DatabaseName);
+            _seeder = new DatabaseSeeder(_database);
         }
 
         public IMongoCollection<Employee> Employees => _database.GetCollection<Employee>("Employees");
         public IMongoCollection<Notification> Notifications => _database.GetCollection<Notification>("Notifications");
+
+        public async Task InitializeAsync()
+        {
+            await _seeder.SeedDataAsync();
+        }
+
+        public static MongoDbContext CreateFromConfig()
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(System.AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+            var settings = config.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+            var options = Options.Create(settings);
+            return new MongoDbContext(options);
+        }
     }
 }

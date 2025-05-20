@@ -1,0 +1,138 @@
+<Page
+    x:Class="EMS.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="clr-namespace:EMS.ViewModels"
+    mc:Ignorable="d"
+    Title="Settings">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        
+        <!-- Card Style -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.2"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Setting Item Style -->
+        <Style x:Key="SettingItemStyle" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,10"/>
+        </Style>
+
+        <!-- Label Style -->
+        <Style x:Key="SettingLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+
+        <!-- ComboBox Style -->
+        <Style x:Key="SettingComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="MinWidth" Value="200"/>
+        </Style>
+
+        <!-- NumericUpDown Style -->
+        <Style x:Key="SettingNumericStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="MinWidth" Value="100"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Settings"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <!-- Settings Content -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel>
+                <!-- User Settings -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="User Preferences"
+                                 FontSize="18"
+                                 FontWeight="Bold"
+                                 Margin="0,0,0,20"/>
+
+                        <!-- Theme Selection -->
+                        <StackPanel Style="{StaticResource SettingItemStyle}">
+                            <TextBlock Text="Theme"
+                                     Style="{StaticResource SettingLabelStyle}"/>
+                            <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                    SelectedItem="{Binding SelectedTheme}"
+                                    Style="{StaticResource SettingComboBoxStyle}"/>
+                        </StackPanel>
+
+                        <!-- Language Selection -->
+                        <StackPanel Style="{StaticResource SettingItemStyle}">
+                            <TextBlock Text="Language"
+                                     Style="{StaticResource SettingLabelStyle}"/>
+                            <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                    SelectedItem="{Binding SelectedLanguage}"
+                                    Style="{StaticResource SettingComboBoxStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Admin Settings -->
+                <Border Style="{StaticResource CardStyle}"
+                        Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="System Settings"
+                                 FontSize="18"
+                                 FontWeight="Bold"
+                                 Margin="0,0,0,20"/>
+
+                        <!-- Pagination Size -->
+                        <StackPanel Style="{StaticResource SettingItemStyle}">
+                            <TextBlock Text="Default Items Per Page"
+                                     Style="{StaticResource SettingLabelStyle}"/>
+                            <TextBox Text="{Binding PaginationSize}"
+                                   Style="{StaticResource SettingNumericStyle}"/>
+                        </StackPanel>
+
+                        <!-- Default Roles -->
+                        <StackPanel Style="{StaticResource SettingItemStyle}">
+                            <TextBlock Text="Default Roles"
+                                     Style="{StaticResource SettingLabelStyle}"/>
+                            <ItemsControl ItemsSource="{Binding DefaultRoles}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding RoleName}"
+                                                IsChecked="{Binding IsDefault}"
+                                                Margin="0,5"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Save Button -->
+                <Button Content="Save Settings"
+                        Command="{Binding SaveSettingsCommand}"
+                        Style="{StaticResource ActionButton}"
+                        HorizontalAlignment="Right"
+                        Margin="10,20,10,0"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page> 

@@ -9,9 +9,9 @@ namespace EMS.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
-        public string Message { get; set; }
+        public required string Message { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsRead { get; set; }
     }

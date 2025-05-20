@@ -11,20 +11,20 @@ namespace EMS.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
-        public string Name { get; set; }
-        public string Position { get; set; }
-        public string Contact { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public UserRole UserRole { get; set; }
+        public required string Name { get; set; }
+        public required string Position { get; set; }
+        public required string Contact { get; set; }
+        public required string Username { get; set; }
+        public required string Password { get; set; }
+        public required UserRole UserRole { get; set; }
         public DateTime DateOfBirth { get; set; }
     }
 
     public class UserRole
     {
         public int RoleID { get; set; }
-        public string RoleName { get; set; }
+        public required string RoleName { get; set; }
     }
 }

@@ -1,0 +1,190 @@
+<Page
+    x:Class="EMS.Views.EmployeeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="clr-namespace:EMS.ViewModels"
+    mc:Ignorable="d"
+    Title="Employee Management">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        
+        <!-- String to Visibility Converter -->
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Background" Value="#6C5CE7"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="MinWidth" Value="100"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#5849BE"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Card Style -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.2"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Search Box Style -->
+        <Style x:Key="SearchBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#666"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="25"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <TextBlock Text="🔍 Search Employee"
+                                         Foreground="#999"
+                                         Margin="2,0,0,0"
+                                         Visibility="{Binding Text.Length, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                <ScrollViewer x:Name="PART_ContentHost"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header with Search and Actions -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Search Box -->
+            <Border Background="White" CornerRadius="25" Width="300" HorizontalAlignment="Left">
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource SearchBoxStyle}"/>
+            </Border>
+
+            <!-- Action Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Search" 
+                        Command="{Binding SearchCommand}"
+                        Style="{StaticResource ActionButton}"/>
+                <Button Content="Add Employee" 
+                        Command="{Binding AddEmployeeCommand}"
+                        Style="{StaticResource ActionButton}"/>
+                <Button Content="Refresh" 
+                        Command="{Binding RefreshCommand}"
+                        Style="{StaticResource ActionButton}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Error Message -->
+        <TextBlock Grid.Row="1" 
+                   Text="{Binding ErrorMessage}"
+                   Foreground="Red"
+                   Margin="0,10"
+                   Visibility="{Binding ErrorMessage, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <!-- Employee List -->
+        <Border Grid.Row="2" 
+                Style="{StaticResource CardStyle}"
+                Margin="0,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Loading Indicator -->
+                <ProgressBar IsIndeterminate="True" 
+                           Height="2" 
+                           Margin="0,0,0,10"
+                           Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Employee DataGrid -->
+                <DataGrid Grid.Row="1"
+                         ItemsSource="{Binding Employees}"
+                         SelectedItem="{Binding SelectedEmployee}"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="False"
+                         CanUserAddRows="False"
+                         CanUserDeleteRows="False"
+                         GridLinesVisibility="Horizontal"
+                         BorderThickness="0"
+                         Background="Transparent">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" 
+                                          Binding="{Binding Name}" 
+                                          Width="*"/>
+                        <DataGridTextColumn Header="Position" 
+                                          Binding="{Binding Position}" 
+                                          Width="*"/>
+                        <DataGridTextColumn Header="Contact" 
+                                          Binding="{Binding Contact}" 
+                                          Width="*"/>
+                        <DataGridTextColumn Header="Username" 
+                                          Binding="{Binding Username}" 
+                                          Width="*"/>
+                        <DataGridTextColumn Header="Password" 
+                                          Binding="{Binding Password}" 
+                                          Width="*"/>
+                        <DataGridTextColumn Header="Role" 
+                                          Binding="{Binding UserRole.RoleName}" 
+                                          Width="*"/>
+                        <DataGridTemplateColumn Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Update"
+                                                Command="{Binding DataContext.UpdateEmployeeCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                Style="{StaticResource ActionButton}"/>
+                                        <Button Content="Reset Password"
+                                                Command="{Binding DataContext.ResetPasswordCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                Style="{StaticResource ActionButton}"/>
+                                        <Button Content="Delete"
+                                                Command="{Binding DataContext.DeleteEmployeeCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                Style="{StaticResource ActionButton}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page> 
