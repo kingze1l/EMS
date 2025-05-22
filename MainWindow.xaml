@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         Title="Employee Management" Height="600" Width="1000" 
-        Background="#F5F6FA" WindowStartupLocation="CenterScreen">
+        Background="{DynamicResource BackgroundBrush}" WindowStartupLocation="CenterScreen">
 
         <Window.Resources>
             <!-- Define DropShadowEffect Resource -->
@@ -12,8 +12,8 @@
 
             <!-- Modern TextBox Style -->
             <Style x:Key="SearchBoxStyle" TargetType="TextBox">
-                <Setter Property="Background" Value="White"/>
-                <Setter Property="Foreground" Value="#666"/>
+                <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Padding" Value="15,8"/>
                 <Setter Property="Template">
@@ -49,7 +49,7 @@
 
             <!-- Modern Button Style -->
             <Style x:Key="ModernButton" TargetType="Button">
-                <Setter Property="Background" Value="#6C5CE7"/>
+                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="Padding" Value="15,10"/>
                 <Setter Property="Margin" Value="5"/>
@@ -74,7 +74,7 @@
 
             <!-- Card Style -->
             <Style x:Key="CardStyle" TargetType="Border">
-                <Setter Property="Background" Value="White"/>
+                <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
                 <Setter Property="CornerRadius" Value="10"/>
                 <Setter Property="Padding" Value="20"/>
                 <Setter Property="Margin" Value="10"/>
@@ -92,10 +92,10 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left Sidebar -->
-            <Border Background="#FFFFFF" Effect="{StaticResource DropShadowEffect}">
+            <Border Background="{DynamicResource BackgroundBrush}" Effect="{StaticResource DropShadowEffect}">
                 <StackPanel>
                     <Image Source="/EMS;component/Assets/people_icon.png" Width="60" Height="60" Margin="20,30"/>
-                    <TextBlock Text="EMS" FontSize="24" FontWeight="Bold" Foreground="#6C5CE7" 
+                    <TextBlock Text="EMS" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" 
                             HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
                     <StackPanel Margin="15,20">
@@ -153,15 +153,15 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Background="White" CornerRadius="25" Width="300" HorizontalAlignment="Left">
+                    <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="25" Width="300" HorizontalAlignment="Left">
                         <TextBox x:Name="SearchBox"
                                 Style="{StaticResource SearchBoxStyle}"
                                 TextChanged="Search_TextChanged"/>
                     </Border>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Border Background="White" CornerRadius="25" Padding="15,8" Margin="0,0,10,0">
-                            <TextBlock x:Name="WelcomeText" Text="Welcome!" FontSize="14" Foreground="#6C5CE7"/>
+                        <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="25" Padding="15,8" Margin="0,0,10,0">
+                            <TextBlock x:Name="WelcomeText" Text="Welcome!" FontSize="14" Foreground="{DynamicResource AccentBrush}"/>
                         </Border>
                         <Button Style="{StaticResource ModernButton}" Click="Notification_Click">
                             <StackPanel Orientation="Horizontal">

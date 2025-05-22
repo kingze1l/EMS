@@ -104,8 +104,40 @@ namespace EMS
         {
             if (_mainFrame != null)
             {
-                // TODO: Navigate to Settings view
-                _mainFrame.Content = null;
+                var app = Application.Current as App;
+                var settingsService = app?.ServiceProvider.GetService<EMS.Services.ISettingsService>();
+                var authService = app?.ServiceProvider.GetService<EMS.Services.AuthenticationService>();
+                var user = authService?.CurrentUser;
+
+                MessageBox.Show($"Debug Info:\nSettingsService: {(settingsService != null ? "Found" : "Not Found")}\n" +
+                               $"AuthService: {(authService != null ? "Found" : "Not Found")}\n" +
+                               $"CurrentUser: {(user != null ? "Found" : "Not Found")}",
+                               "Debug Info");
+
+                if (settingsService != null && user != null)
+                {
+                    try
+                    {
+                        var viewModel = new EMS.ViewModels.SettingsViewModel(
+                            settingsService,
+                            user.Id,
+                            authService.IsUserInRole("Admin")
+                        );
+                        var settingsView = new EMS.Views.SettingsView
+                        {
+                            DataContext = viewModel
+                        };
+                        _mainFrame.Content = settingsView;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error creating Settings view: {ex.Message}", "Error");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Required services or user information is missing.", "Error");
+                }
             }
         }
 

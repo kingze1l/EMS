@@ -7,6 +7,8 @@ using System.IO;
 using System;
 using EMS.Services;
 using EMS.Models;
+using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 namespace EMS
 {
@@ -39,8 +41,19 @@ namespace EMS
                 options.ConnectionString = "mongodb+srv://Kingzell:utqbm9GnwSQ99QDH@ems.m64qhyk.mongodb.net/";
                 options.DatabaseName = "EMS";
             });
+
+            // Register MongoDB services
             services.AddSingleton<MongoDbContext>();
+            services.AddSingleton<IMongoDatabase>(sp =>
+            {
+                var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+                var client = new MongoClient(settings.ConnectionString);
+                return client.GetDatabase(settings.DatabaseName);
+            });
+
+            // Register application services
             services.AddSingleton<IEmployeeService, EmployeeService>();
+            services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<AuthenticationService>();
             services.AddTransient<LoginWindow>();
             services.AddTransient<MainWindow>();

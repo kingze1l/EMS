@@ -48,6 +48,7 @@ namespace EMS.ViewModels
                 if (_userSettings != null)
                 {
                     _userSettings.Theme = value;
+                    ThemeManager.Instance.ApplyTheme(value);
                     OnPropertyChanged();
                 }
             }
@@ -128,6 +129,9 @@ namespace EMS.ViewModels
                 {
                     _adminSettings = await _settingsService.GetAdminSettingsAsync();
                 }
+
+                // Apply the current theme
+                ThemeManager.Instance.ApplyTheme(SelectedTheme);
 
                 OnPropertyChanged(nameof(SelectedTheme));
                 OnPropertyChanged(nameof(SelectedLanguage));
