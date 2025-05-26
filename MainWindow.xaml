@@ -143,6 +143,7 @@
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -172,9 +173,15 @@
                 </StackPanel>
             </Grid>
 
+            <!-- Admin Panel (hidden unless user has permission) -->
+            <StackPanel x:Name="AdminPanel" Orientation="Horizontal" Margin="20,10,20,0" Grid.Row="1" Visibility="Collapsed">
+                <Button Content="Role Management" Style="{StaticResource ModernButton}" Click="RoleManagement_Click"/>
+                <!-- Add more admin-only controls here -->
+            </StackPanel>
+
             <!-- Content Frame -->
             <Frame x:Name="MainFrame" 
-                   Grid.Row="1" 
+                   Grid.Row="2" 
                    NavigationUIVisibility="Hidden"
                    Background="Transparent"/>
         </Grid>

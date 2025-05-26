@@ -29,7 +29,17 @@ namespace EMS.Services
                     Contact = "N/A",
                     Username = "samiullah",
                     Password = "samiullah",
-                    UserRole = new UserRole { RoleName = "Admin" },
+                    UserRole = new UserRole {
+                        RoleID = 0,
+                        RoleName = "Admin",
+                        Permissions = new List<Permission> {
+                            Permission.ViewEmployees,
+                            Permission.EditEmployees,
+                            Permission.ViewReports,
+                            Permission.EditRoles,
+                            Permission.ManageUsers
+                        }
+                    },
                     DateOfBirth = DateTime.MinValue
                 };
                 return true;
@@ -57,5 +67,10 @@ namespace EMS.Services
         }
 
         public bool IsAuthenticated => _currentUser != null;
+
+        public bool HasPermission(Permission permission)
+        {
+            return _currentUser?.UserRole.Permissions.Contains(permission) ?? false;
+        }
     }
 } 

@@ -6,6 +6,7 @@ using EMS.Services;
 using EMS.Views;
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using EMS.Models; // Add this namespace to access the Permission enum
 
 namespace EMS
 {
@@ -45,7 +46,7 @@ namespace EMS
                 // Find the AdminPanel by name
                 if (FindName("AdminPanel") is StackPanel adminPanel)
                 {
-                    adminPanel.Visibility = _authService.IsUserInRole("Admin") ? 
+                    adminPanel.Visibility = _authService.HasPermission(EMS.Models.Permission.EditRoles) ? 
                         Visibility.Visible : Visibility.Collapsed;
                 }
             }
@@ -172,6 +173,21 @@ namespace EMS
         {
             MessageBox.Show("No new notifications", "Notifications", 
                 MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void RoleManagement_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_mainFrame != null)
+                {
+                    _mainFrame.Content = new EMS.Views.RoleManagementView();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Error loading Role Management");
+            }
         }
     }
 }

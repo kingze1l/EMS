@@ -1,12 +1,27 @@
-//Employee.cs
-
-
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
+using System.Collections.Generic;
 
 namespace EMS.Models
 {
+    public enum Permission
+    {
+        ViewEmployees,
+        EditEmployees,
+        ViewReports,
+        EditRoles,
+        ManageUsers,
+        // Add more as needed
+    }
+
+    public class UserRole
+    {
+        public int RoleID { get; set; }
+        public required string RoleName { get; set; }
+        public List<Permission> Permissions { get; set; } = new();
+    }
+
     public class Employee
     {
         [BsonId]
@@ -21,10 +36,9 @@ namespace EMS.Models
         public required UserRole UserRole { get; set; }
         public DateTime DateOfBirth { get; set; }
     }
-
-    public class UserRole
-    {
-        public int RoleID { get; set; }
-        public required string RoleName { get; set; }
-    }
 }
+
+// Example roles (to be seeded in DB):
+// Admin: All permissions
+// Manager: ViewEmployees, EditEmployees, ViewReports
+// HR: ViewEmployees, ManageUsers 

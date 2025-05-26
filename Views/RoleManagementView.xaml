@@ -1,0 +1,62 @@
+<Page x:Class="EMS.Views.RoleManagementView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:models="clr-namespace:EMS.Models"
+      xmlns:converters="clr-namespace:EMS.Converters"
+      Title="Role Management">
+    <Page.Resources>
+        <Style x:Key="PermissionCheckBox" TargetType="CheckBox">
+            <Setter Property="Margin" Value="5,0,5,0"/>
+        </Style>
+        <converters:PermissionListContainsConverter x:Key="PermissionListContainsConverter"/>
+    </Page.Resources>
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <!-- Roles List -->
+        <GroupBox Header="Roles" Grid.Column="0" Margin="10">
+            <StackPanel>
+                <DataGrid ItemsSource="{Binding Roles}" SelectedItem="{Binding SelectedRole, Mode=TwoWay}" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Role Name" Binding="{Binding RoleName}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button Content="Add New Role" Command="{Binding AddRoleCommand}" Margin="0,10,0,0"/>
+            </StackPanel>
+        </GroupBox>
+        <!-- Role Details -->
+        <GroupBox Header="Role Details" Grid.Column="1" Margin="10">
+            <StackPanel>
+                <TextBlock Text="Role Name:" FontWeight="Bold"/>
+                <TextBox Text="{Binding SelectedRole.RoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}" Margin="0,0,0,10"/>
+                <TextBlock Text="Permissions:" FontWeight="Bold"/>
+                <ItemsControl ItemsSource="{Binding AllPermissions}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding}" Style="{StaticResource PermissionCheckBox}">
+                                <CheckBox.IsChecked>
+                                    <MultiBinding Converter="{StaticResource PermissionListContainsConverter}" Mode="OneWay">
+                                        <Binding Path="DataContext.SelectedRole.Permissions" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                        <Binding />
+                                    </MultiBinding>
+                                </CheckBox.IsChecked>
+                                <CheckBox.Command>
+                                    <Binding Path="DataContext.TogglePermissionCommand" RelativeSource="{RelativeSource AncestorType=Page}"/>
+                                </CheckBox.Command>
+                                <CheckBox.CommandParameter>
+                                    <Binding />
+                                </CheckBox.CommandParameter>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="Save" Command="{Binding SaveRoleCommand}" Margin="0,0,10,0"/>
+                    <Button Content="Cancel" Command="{Binding CancelEditCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</Page> 
