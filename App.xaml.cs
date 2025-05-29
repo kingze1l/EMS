@@ -55,6 +55,7 @@ namespace EMS
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<AuthenticationService>();
+            services.AddSingleton<IRoleService, RoleService>();
             services.AddTransient<LoginWindow>();
             services.AddTransient<MainWindow>();
         }

@@ -13,4 +13,4 @@ namespace EMS.Services
         Task<bool> UpdateEmployeeAsync(Employee employee, UserRole currentUserRole);
         Task<bool> DeleteEmployeeAsync(string id, UserRole currentUserRole);
     }
-} 
+}

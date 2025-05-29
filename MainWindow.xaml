@@ -136,7 +136,7 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-            </StackPanel>
+        </StackPanel>
         </Border>
 
         <!-- Main Content -->

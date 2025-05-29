@@ -1,8 +1,17 @@
 ﻿<Application x:Class="EMS.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:EMS.Converters"
+             xmlns:models="clr-namespace:EMS.Models">
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
             <!-- Light Theme Colors -->
             <Color x:Key="LightBackground">#FFFFFF</Color>
             <Color x:Key="LightForeground">#000000</Color>
@@ -105,6 +114,18 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
+            <!-- Converters -->
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:BooleanToBrushConverter x:Key="BooleanToBrushConverter"/>
+
+            <!-- Role Type Values -->
+            <x:Array x:Key="RoleTypeValues" Type="models:RoleType">
+                <models:RoleType>Admin</models:RoleType>
+                <models:RoleType>Manager</models:RoleType>
+                <models:RoleType>HR</models:RoleType>
+                <models:RoleType>Employee</models:RoleType>
+            </x:Array>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

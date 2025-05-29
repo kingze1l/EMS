@@ -10,7 +10,7 @@ namespace EMS.ViewModels
 
         public RelayCommand(Action execute, Func<bool>? canExecute = null)
         {
-            _execute = execute;
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
 
@@ -20,22 +20,45 @@ namespace EMS.ViewModels
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public bool CanExecute(object? parameter) => _canExecute?.Invoke() ?? true;
+        public bool CanExecute(object? parameter)
+        {
+            return _canExecute == null || _canExecute();
+        }
 
-        public void Execute(object? parameter) => _execute();
+        public void Execute(object? parameter)
+        {
+            _execute();
+        }
     }
 
     public class RelayCommand<T> : ICommand
     {
         private readonly Action<T> _execute;
         private readonly Func<T, bool>? _canExecute;
+
         public RelayCommand(Action<T> execute, Func<T, bool>? canExecute = null)
         {
-            _execute = execute;
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
-        public bool CanExecute(object? parameter) => parameter is T t && (_canExecute?.Invoke(t) ?? true);
-        public void Execute(object? parameter) { if (parameter is T t) _execute(t); }
-        public event EventHandler? CanExecuteChanged { add { } remove { } }
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return parameter is T typedParameter && (_canExecute == null || _canExecute(typedParameter));
+        }
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is T typedParameter)
+            {
+                _execute(typedParameter);
+            }
+        }
     }
 } 

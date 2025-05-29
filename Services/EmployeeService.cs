@@ -30,7 +30,7 @@ namespace EMS.Services
         {
             var employee = await _employees.Find(e => e.Id == id).FirstOrDefaultAsync();
             if (employee == null) return null;
-            
+
             return currentUserRole.RoleName == "Admin" ? employee : SanitizeEmployeeData(employee);
         }
 
@@ -44,6 +44,16 @@ namespace EMS.Services
         {
             try
             {
+                // Assign default role if none is provided
+                if (employee.UserRole == null)
+                {
+                    employee.UserRole = new UserRole
+                    {
+                        RoleID = 3, // Assuming 3 is the ID for 'Employee'
+                        RoleName = "Employee",
+                        Permissions = new List<Permission> { Permission.ViewEmployees }
+                    };
+                }
                 // Hash the password before storing
                 employee.Password = BCrypt.Net.BCrypt.HashPassword(employee.Password);
                 await _employees.InsertOneAsync(employee);
@@ -123,4 +133,4 @@ namespace EMS.Services
             };
         }
     }
-} 
+}

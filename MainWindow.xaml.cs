@@ -7,6 +7,7 @@ using EMS.Views;
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using EMS.Models; // Add this namespace to access the Permission enum
+using EMS.ViewModels;  // Add this line
 
 namespace EMS
 {
@@ -181,12 +182,27 @@ namespace EMS
             {
                 if (_mainFrame != null)
                 {
-                    _mainFrame.Content = new EMS.Views.RoleManagementView();
+                    var app = Application.Current as App;
+                    var roleService = app?.ServiceProvider.GetService<IRoleService>();
+                    
+                    if (roleService != null)
+                    {
+                        var viewModel = new RoleManagementViewModel(roleService);
+                        var view = new RoleManagementView
+                        {
+                            DataContext = viewModel
+                        };
+                        _mainFrame.Content = view;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Role service is not available.", "Error");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "Error loading Role Management");
+                MessageBox.Show($"Error loading Role Management: {ex.Message}", "Error");
             }
         }
     }
