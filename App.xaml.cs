@@ -9,6 +9,7 @@ using EMS.Services;
 using EMS.Models;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace EMS
 {
@@ -36,11 +37,7 @@ namespace EMS
                 .Build();
 
             // Configure MongoDB
-            services.Configure<MongoDbSettings>(options =>
-            {
-                options.ConnectionString = "mongodb+srv://Kingzell:utqbm9GnwSQ99QDH@ems.m64qhyk.mongodb.net/";
-                options.DatabaseName = "EMS";
-            });
+            services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 
             // Register MongoDB services
             services.AddSingleton<MongoDbContext>();
@@ -60,9 +57,17 @@ namespace EMS
             services.AddTransient<MainWindow>();
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // Initialize the database seeder
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+                await dbContext.InitializeAsync();
+            }
+
             var loginWindow = _serviceProvider.GetRequiredService<LoginWindow>();
             loginWindow.Show();
         }
