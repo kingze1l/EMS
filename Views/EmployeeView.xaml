@@ -79,6 +79,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -109,15 +110,72 @@
             </StackPanel>
         </Grid>
 
+        <!-- Edit/Add Employee Section -->
+        <Border Grid.Row="1" 
+                Style="{StaticResource CardStyle}"
+                Margin="0,10"
+                Visibility="{Binding IsEditingOrAdding, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Text="Employee Details" Style="{StaticResource MaterialDesignHeadline6TextBlock}" Margin="0,0,0,10"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedEmployee.Name, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <TextBlock Text="Position:" Grid.Row="1" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedEmployee.Position, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <TextBlock Text="Contact:" Grid.Row="2" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedEmployee.Contact, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <TextBlock Text="Username:" Grid.Row="3" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedEmployee.Username, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                    <!-- Role Selection Dropdown -->
+                    <TextBlock Text="Role:" Grid.Row="4" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Row="4" Grid.Column="1"
+                              ItemsSource="{Binding AvailableRoles}"
+                              SelectedItem="{Binding SelectedRoleForEmployee}"
+                              DisplayMemberPath="RoleName"
+                              Margin="5"/>
+
+                     <!-- Password Field (Optional - can be hidden for existing users or handled by Reset Password) -->
+                    <TextBlock Text="Password:" Grid.Row="5" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
+                    <!-- Note: Binding password directly is not recommended due to security. Use a separate password box and handle securely in ViewModel. -->
+                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding SelectedEmployee.Password, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+
+                </Grid>
+
+                <!-- Save/Cancel Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Save" Command="{Binding SaveEmployeeCommand}" Style="{StaticResource ActionButton}"/>
+                    <Button Content="Cancel" Command="{Binding CancelEditCommand}" Style="{StaticResource ActionButton}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
         <!-- Error Message -->
-        <TextBlock Grid.Row="1" 
+        <TextBlock Grid.Row="2" 
                    Text="{Binding ErrorMessage}"
                    Foreground="Red"
                    Margin="0,10"
                    Visibility="{Binding ErrorMessage, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
         <!-- Employee List -->
-        <Border Grid.Row="2" 
+        <Border Grid.Row="3" 
                 Style="{StaticResource CardStyle}"
                 Margin="0,10">
             <Grid>

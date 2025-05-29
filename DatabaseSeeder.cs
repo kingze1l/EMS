@@ -3,18 +3,19 @@ using EMS.Models;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EMS
 {
     public class DatabaseSeeder
     {
         private readonly IMongoCollection<Employee> _employeeCollection;
-        private readonly IMongoCollection<UserRole> _roleCollection;
+        private readonly IMongoCollection<Role> _roleCollection;
 
         public DatabaseSeeder(IMongoDatabase database)
         {
             _employeeCollection = database.GetCollection<Employee>("Employees");
-            _roleCollection = database.GetCollection<UserRole>("Roles");
+            _roleCollection = database.GetCollection<Role>("roles");
         }
 
         public async Task SeedDataAsync()
@@ -26,45 +27,63 @@ namespace EMS
             }
 
             // Create roles
-            var adminRole = new UserRole 
+            var adminRole = new Role 
             { 
-                RoleID = 1, 
                 RoleName = "Admin", 
-                Permissions = new List<Permission> 
+                Type = RoleType.Admin,
+                Description = "Administrator role with full permissions",
+                IsSystemRole = true,
+                Permissions = new List<string> 
                 { 
-                    Permission.ViewEmployees, 
-                    Permission.EditEmployees, 
-                    Permission.ViewReports, 
-                    Permission.EditRoles, 
-                    Permission.ManageUsers 
+                    Permission.ViewEmployees.ToString(),
+                    Permission.EditEmployees.ToString(),
+                    Permission.ViewReports.ToString(),
+                    Permission.EditRoles.ToString(),
+                    Permission.ManageUsers.ToString()
                 } 
             };
 
-            var managerRole = new UserRole 
+            var managerRole = new Role 
             { 
-                RoleID = 2, 
                 RoleName = "Manager", 
-                Permissions = new List<Permission> 
+                Type = RoleType.Manager,
+                Description = "Manager role with reporting and employee view/edit permissions",
+                IsSystemRole = true,
+                Permissions = new List<string> 
                 { 
-                    Permission.ViewEmployees, 
-                    Permission.EditEmployees, 
-                    Permission.ViewReports 
+                    Permission.ViewEmployees.ToString(),
+                    Permission.EditEmployees.ToString(),
+                    Permission.ViewReports.ToString()
                 } 
             };
 
-            var hrRole = new UserRole 
+            var hrRole = new Role 
             { 
-                RoleID = 3, 
                 RoleName = "HR", 
-                Permissions = new List<Permission> 
+                Type = RoleType.HR,
+                Description = "HR role with employee and user management permissions",
+                IsSystemRole = true,
+                Permissions = new List<string> 
                 { 
-                    Permission.ViewEmployees, 
-                    Permission.ManageUsers 
+                    Permission.ViewEmployees.ToString(),
+                    Permission.ManageUsers.ToString()
+                } 
+            };
+
+            var employeeRole = new Role 
+            { 
+                RoleName = "Employee", 
+                Type = RoleType.Employee,
+                Description = "Standard employee role with basic permissions",
+                IsSystemRole = true,
+                Permissions = new List<string> 
+                { 
+                    Permission.ViewEmployees.ToString()
                 } 
             };
 
             // Insert roles
-            await _roleCollection.InsertManyAsync(new[] { adminRole, managerRole, hrRole });
+            await _roleCollection.InsertManyAsync(new[] { adminRole, managerRole, hrRole, employeeRole });
 
             // Create initial employees
             var employees = new List<Employee>
@@ -76,7 +95,12 @@ namespace EMS
                     Contact = "admin@company.com",
                     Username = "admin",
                     Password = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                    UserRole = adminRole,
+                    UserRole = new UserRole
+                    {
+                        RoleID = 1,
+                        RoleName = adminRole.RoleName,
+                        Permissions = ConvertPermissionStringsToEnums(adminRole.Permissions)
+                    },
                     DateOfBirth = new DateTime(1980, 5, 15)
                 },
                 new Employee
@@ -86,7 +110,12 @@ namespace EMS
                     Contact = "manager@company.com",
                     Username = "manager",
                     Password = BCrypt.Net.BCrypt.HashPassword("manager123"),
-                    UserRole = managerRole,
+                    UserRole = new UserRole
+                    {
+                        RoleID = 2,
+                        RoleName = managerRole.RoleName,
+                        Permissions = ConvertPermissionStringsToEnums(managerRole.Permissions)
+                    },
                     DateOfBirth = new DateTime(1985, 3, 10)
                 },
                 new Employee
@@ -96,13 +125,48 @@ namespace EMS
                     Contact = "hr@company.com",
                     Username = "hr",
                     Password = BCrypt.Net.BCrypt.HashPassword("hr123"),
-                    UserRole = hrRole,
+                    UserRole = new UserRole
+                    {
+                        RoleID = 3,
+                        RoleName = hrRole.RoleName,
+                        Permissions = ConvertPermissionStringsToEnums(hrRole.Permissions)
+                    },
                     DateOfBirth = new DateTime(1990, 8, 22)
+                },
+                new Employee
+                {
+                    Name = "Regular Employee",
+                    Position = "Associate",
+                    Contact = "employee@company.com",
+                    Username = "employee",
+                    Password = BCrypt.Net.BCrypt.HashPassword("employee123"),
+                    UserRole = new UserRole
+                    {
+                        RoleID = 4,
+                        RoleName = employeeRole.RoleName,
+                        Permissions = ConvertPermissionStringsToEnums(employeeRole.Permissions)
+                    },
+                    DateOfBirth = new DateTime(1995, 1, 1)
                 }
             };
 
             // Insert employees
             await _employeeCollection.InsertManyAsync(employees);
+        }
+
+        private List<Permission> ConvertPermissionStringsToEnums(List<string> permissionNames)
+        {
+            var permissions = new List<Permission>();
+            if (permissionNames == null) return permissions;
+
+            foreach (var name in permissionNames)
+            {
+                if (Enum.TryParse(name, out Permission permissionEnum))
+                {
+                    permissions.Add(permissionEnum);
+                }
+            }
+            return permissions;
         }
     }
 } 

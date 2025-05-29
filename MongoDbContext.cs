@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using EMS.Models;
+using System;
 
 namespace EMS
 {
@@ -13,6 +14,10 @@ namespace EMS
 
         public MongoDbContext(IOptions<MongoDbSettings> settings)
         {
+            if (settings.Value == null)
+            {
+                throw new ArgumentNullException(nameof(settings.Value), "MongoDbSettings are not configured.");
+            }
             var client = new MongoClient(settings.Value.ConnectionString);
             _database = client.GetDatabase(settings.Value.DatabaseName);
             _seeder = new DatabaseSeeder(_database);
@@ -33,6 +38,12 @@ namespace EMS
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
             var settings = config.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+            
+            if (settings == null)
+            {
+                 throw new InvalidOperationException("MongoDbSettings section not found in appsettings.json.");
+            }
+
             var options = Options.Create(settings);
             return new MongoDbContext(options);
         }

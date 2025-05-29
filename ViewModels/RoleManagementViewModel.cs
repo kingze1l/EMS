@@ -15,7 +15,7 @@ namespace EMS.ViewModels
     {
         private readonly IRoleService _roleService;
         private ObservableCollection<Role> _roles;
-        private Role _selectedRole;
+        private Role? _selectedRole;
         private ObservableCollection<PermissionGroup> _permissionGroups;
         private bool _isEditing;
         private string _searchText = string.Empty;
@@ -24,14 +24,15 @@ namespace EMS.ViewModels
         {
             _roleService = roleService;
             _roles = new ObservableCollection<Role>();
+            _selectedRole = null;
             _permissionGroups = new ObservableCollection<PermissionGroup>();
             
             LoadRolesCommand = new RelayCommand(() => LoadRoles());
             AddRoleCommand = new RelayCommand(AddRole);
             EditRoleCommand = new RelayCommand(EditRole, () => SelectedRole != null);
-            SaveRoleCommand = new RelayCommand(async () => await SaveRole(), () => IsEditing);
+            SaveRoleCommand = new RelayCommand(async () => await SaveRole(), () => IsEditing && SelectedRole != null);
             CancelEditCommand = new RelayCommand(CancelEdit, () => IsEditing);
-            DeleteRoleCommand = new RelayCommand(async () => await DeleteRole(), () => CanDeleteRole);
+            DeleteRoleCommand = new RelayCommand(async () => await DeleteRole(), () => CanDeleteRole && SelectedRole != null);
             SearchCommand = new RelayCommand(() => FilterRoles());
 
             LoadRoles();
@@ -47,7 +48,7 @@ namespace EMS.ViewModels
             }
         }
 
-        public Role SelectedRole
+        public Role? SelectedRole
         {
             get => _selectedRole;
             set
@@ -60,6 +61,11 @@ namespace EMS.ViewModels
                 {
                     LoadRolePermissions();
                 }
+                else
+                {
+                    PermissionGroups.Clear();
+                }
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -81,6 +87,7 @@ namespace EMS.ViewModels
                 _isEditing = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsViewing));
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -112,6 +119,8 @@ namespace EMS.ViewModels
         {
             var roles = await _roleService.GetAllRolesAsync();
             Roles = new ObservableCollection<Role>(roles);
+            SelectedRole = null;
+            PermissionGroups.Clear();
         }
 
         private void AddRole()
@@ -132,6 +141,7 @@ namespace EMS.ViewModels
             if (SelectedRole != null && !SelectedRole.IsSystemRole)
             {
                 IsEditing = true;
+                LoadRolePermissions();
             }
         }
 
@@ -141,6 +151,12 @@ namespace EMS.ViewModels
 
             try
             {
+                SelectedRole.Permissions = PermissionGroups
+                    .SelectMany(pg => pg.Permissions)
+                    .Where(p => p.IsSelected)
+                    .Select(p => p.Name)
+                    .ToList();
+
                 if (string.IsNullOrEmpty(SelectedRole.Id))
                 {
                     await _roleService.CreateRoleAsync(SelectedRole);
@@ -150,11 +166,10 @@ namespace EMS.ViewModels
                     await _roleService.UpdateRoleAsync(SelectedRole);
                 }
                 LoadRoles();
-                IsEditing = false;
+                CancelEdit();
             }
             catch (Exception ex)
             {
-                // TODO: Show error message
                 System.Diagnostics.Debug.WriteLine($"Error saving role: {ex.Message}");
             }
         }
@@ -176,7 +191,6 @@ namespace EMS.ViewModels
             }
             catch (Exception ex)
             {
-                // TODO: Show error message
                 System.Diagnostics.Debug.WriteLine($"Error deleting role: {ex.Message}");
             }
         }
@@ -186,15 +200,17 @@ namespace EMS.ViewModels
             if (SelectedRole == null) return;
 
             var groups = new ObservableCollection<PermissionGroup>();
-            foreach (var category in typeof(PermissionDefinition.Categories).GetFields())
-            {
-                var categoryName = category.GetValue(null)?.ToString();
-                if (string.IsNullOrEmpty(categoryName)) continue;
+            var categories = typeof(PermissionDefinition.Categories).GetFields()
+                .Where(f => f.IsLiteral && !f.IsInitOnly)
+                .Select(f => f.GetValue(null)?.ToString())
+                .Where(name => !string.IsNullOrEmpty(name));
 
-                var permissions = await _roleService.GetPermissionsByCategoryAsync(categoryName);
+            foreach (var categoryName in categories)
+            {
+                var permissions = await _roleService.GetPermissionsByCategoryAsync(categoryName!);
                 var group = new PermissionGroup
                 {
-                    Category = categoryName,
+                    Category = categoryName!,
                     Permissions = new ObservableCollection<PermissionItem>(
                         permissions.Select(p => new PermissionItem
                         {
@@ -235,14 +251,14 @@ namespace EMS.ViewModels
 
     public class PermissionGroup
     {
-        public string Category { get; set; }
-        public ObservableCollection<PermissionItem> Permissions { get; set; }
+        public string Category { get; set; } = string.Empty;
+        public ObservableCollection<PermissionItem> Permissions { get; set; } = new ObservableCollection<PermissionItem>();
     }
 
     public class PermissionItem
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public bool IsSelected { get; set; }
     }
 } 
