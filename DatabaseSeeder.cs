@@ -26,6 +26,9 @@ namespace EMS
                 return;
             }
 
+            // Clear existing roles to ensure a fresh seed
+            await _roleCollection.DeleteManyAsync(FilterDefinition<Role>.Empty);
+
             // Create roles
             var adminRole = new Role 
             { 

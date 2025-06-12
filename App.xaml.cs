@@ -10,6 +10,7 @@ using EMS.Models;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
+using EMS.Views;
 
 namespace EMS
 {
@@ -53,8 +54,20 @@ namespace EMS
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<AuthenticationService>();
             services.AddSingleton<IRoleService, RoleService>();
-            services.AddTransient<LoginWindow>();
-            services.AddTransient<MainWindow>();
+            services.AddSingleton<INotificationService, NotificationService>();
+            services.AddSingleton<IAuditLogService, AuditLogService>();
+            services.AddSingleton<ILeaveService, LeaveService>();
+            services.AddSingleton<IPayrollService, PayrollService>();
+            services.AddTransient<PayrollView>();
+            services.AddSingleton<MainWindow>();
+            services.AddSingleton<LoginWindow>();
+            services.AddSingleton<DashboardView>();
+            services.AddSingleton<EmployeeView>();
+            services.AddTransient<SettingsView>();
+            services.AddSingleton<RoleManagementView>();
+            services.AddSingleton<NotificationView>();
+            services.AddSingleton<AuditLogView>();
+            services.AddTransient<LeaveRequestView>();
         }
 
         protected override async void OnStartup(StartupEventArgs e)
@@ -68,7 +81,7 @@ namespace EMS
                 await dbContext.InitializeAsync();
             }
 
-            var loginWindow = _serviceProvider.GetRequiredService<LoginWindow>();
+            var loginWindow = new LoginWindow();
             loginWindow.Show();
         }
     }

@@ -1,20 +1,39 @@
 using System.Windows;
 using System.Windows.Controls;
 using EMS.Services;
+using EMS.Models;
 using System;
+using EMS.Utils;
+
 namespace EMS
 {
     public partial class LoginWindow : Window
     {
         private readonly AuthenticationService _authService;
+        private readonly IEmployeeService _employeeService;
+        private readonly ISettingsService _settingsService;
+        private readonly IRoleService _roleService;
+        private readonly INotificationService _notificationService;
+        private readonly IAuditLogService _auditLogService;
         private PasswordBox? _passwordBox;
         private TextBox? _usernameTextBox;
         private TextBlock? _errorMessage;
 
-        public LoginWindow(AuthenticationService authService)
+        public LoginWindow(
+            AuthenticationService authService,
+            IEmployeeService employeeService,
+            ISettingsService settingsService,
+            IRoleService roleService,
+            INotificationService notificationService,
+            IAuditLogService auditLogService)
         {
             InitializeComponent();
             _authService = authService;
+            _employeeService = employeeService;
+            _settingsService = settingsService;
+            _roleService = roleService;
+            _notificationService = notificationService;
+            _auditLogService = auditLogService;
 
             // Get references to controls after InitializeComponent  
             _passwordBox = (PasswordBox)FindName("PasswordBox");
@@ -27,7 +46,13 @@ namespace EMS
             }
         }
 
-        public LoginWindow() : this(new AuthenticationService(MongoDbContext.CreateFromConfig()))
+        public LoginWindow() : this(
+            new AuthenticationService(MongoDbContext.CreateFromConfig()),
+            new EmployeeService(MongoDbContext.CreateFromConfig()),
+            new SettingsService(MongoDbContext.CreateFromConfig().Database),
+            new RoleService(MongoDbContext.CreateFromConfig().Database),
+            new NotificationService(MongoDbContext.CreateFromConfig().Database),
+            new AuditLogService(MongoDbContext.CreateFromConfig().Database))
         {
             // For XAML designer and default instantiation
         }
@@ -60,12 +85,42 @@ namespace EMS
 
                 if (isAuthenticated)
                 {
-                    var mainWindow = new MainWindow(_authService);
+                    // Log successful login
+                    await _auditLogService.LogActionAsync(new AuditLog
+                    {
+                        UserId = _authService.CurrentUser?.Id ?? "unknown",
+                        UserName = username,
+                        Action = "Login",
+                        EntityType = "User",
+                        EntityId = _authService.CurrentUser?.Id ?? "unknown",
+                        Details = "User logged in successfully",
+                        IpAddress = NetworkUtils.GetLocalIpAddress()
+                    });
+
+                    var mainWindow = new MainWindow(
+                        _authService,
+                        _employeeService,
+                        _settingsService,
+                        _roleService,
+                        _notificationService,
+                        _auditLogService);
                     mainWindow.Show();
                     this.Close();
                 }
                 else
                 {
+                    // Log failed login attempt
+                    await _auditLogService.LogActionAsync(new AuditLog
+                    {
+                        UserId = "unknown",
+                        UserName = username,
+                        Action = "LoginFailed",
+                        EntityType = "User",
+                        EntityId = "unknown",
+                        Details = "Failed login attempt",
+                        IpAddress = NetworkUtils.GetLocalIpAddress()
+                    });
+
                     ShowError("Invalid username or password.");
                     if (_passwordBox != null)
                     {

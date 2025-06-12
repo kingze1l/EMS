@@ -42,18 +42,38 @@ namespace EMS.Services
 
         private void ApplyLightTheme()
         {
-            _appResources["BackgroundBrush"] = new SolidColorBrush((Color)_appResources["LightBackground"]);
+            var backgroundBrush = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(0, 1)
+            };
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)_appResources["LightBackground"], 0));
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)_appResources["LightBackgroundSecondary"], 1));
+
+            _appResources["BackgroundBrush"] = backgroundBrush;
             _appResources["ForegroundBrush"] = new SolidColorBrush((Color)_appResources["LightForeground"]);
             _appResources["AccentBrush"] = new SolidColorBrush((Color)_appResources["LightAccent"]);
             _appResources["BorderBrush"] = new SolidColorBrush((Color)_appResources["LightBorder"]);
+            _appResources["AlternateRowBrush"] = new SolidColorBrush((Color)_appResources["LightAlternateRow"]);
+            _appResources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)_appResources["LightHeaderBackground"]);
         }
 
         private void ApplyDarkTheme()
         {
-            _appResources["BackgroundBrush"] = new SolidColorBrush((Color)_appResources["DarkBackground"]);
+            var backgroundBrush = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(0, 1)
+            };
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)_appResources["DarkBackground"], 0));
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)_appResources["DarkBackgroundSecondary"], 1));
+
+            _appResources["BackgroundBrush"] = backgroundBrush;
             _appResources["ForegroundBrush"] = new SolidColorBrush((Color)_appResources["DarkForeground"]);
             _appResources["AccentBrush"] = new SolidColorBrush((Color)_appResources["DarkAccent"]);
             _appResources["BorderBrush"] = new SolidColorBrush((Color)_appResources["DarkBorder"]);
+            _appResources["AlternateRowBrush"] = new SolidColorBrush((Color)_appResources["DarkAlternateRow"]);
+            _appResources["HeaderBackgroundBrush"] = new SolidColorBrush((Color)_appResources["DarkHeaderBackground"]);
         }
 
         private void ApplySystemTheme()

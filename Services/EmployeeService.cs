@@ -54,8 +54,7 @@ namespace EMS.Services
                         Permissions = new List<Permission> { Permission.ViewEmployees }
                     };
                 }
-                // Hash the password before storing
-                employee.Password = BCrypt.Net.BCrypt.HashPassword(employee.Password);
+                // Password is already hashed in the ViewModel
                 await _employees.InsertOneAsync(employee);
                 return true;
             }
@@ -72,25 +71,7 @@ namespace EMS.Services
 
             try
             {
-                // If password is being updated, hash it
-                if (!string.IsNullOrEmpty(employee.Password))
-                {
-                    employee.Password = BCrypt.Net.BCrypt.HashPassword(employee.Password);
-                }
-                else
-                {
-                    // Keep the existing password
-                    var existingEmployee = await GetEmployeeByIdAsync(employee.Id, currentUserRole);
-                    if (existingEmployee != null)
-                    {
-                        employee.Password = existingEmployee.Password;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
+                // Password is already hashed in the ViewModel if it was changed
                 var result = await _employees.ReplaceOneAsync(e => e.Id == employee.Id, employee);
                 return result.ModifiedCount > 0;
             }

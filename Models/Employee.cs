@@ -12,6 +12,10 @@ namespace EMS.Models
         ViewReports,
         EditRoles,
         ManageUsers,
+        ViewPayroll,
+        EditPayroll,
+        GeneratePayroll,
+        ViewPayrollHistory,
         // Add more as needed
     }
 
@@ -35,6 +39,9 @@ namespace EMS.Models
         public required string Password { get; set; }
         public required UserRole UserRole { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public decimal BasePay { get; set; }
+        public decimal Bonus { get; set; }
+        public decimal Deductions { get; set; }
     }
 }
 

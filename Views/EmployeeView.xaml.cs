@@ -4,6 +4,7 @@ using EMS.ViewModels;
 using EMS.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using System.Security;
 
 namespace EMS.Views
 {
@@ -12,20 +13,22 @@ namespace EMS.Views
     /// </summary>
     public partial class EmployeeView : Page
     {
-        public EmployeeView(IEmployeeService employeeService, UserRole currentUserRole)
+        private EmployeeViewModel _viewModel;
+
+        public EmployeeView(IEmployeeService employeeService, IRoleService roleService, IAuditLogService auditLogService, UserRole currentUserRole)
         {
             InitializeComponent();
-            var app = Application.Current as App;
-            // Pass the current user role to the EmployeeViewModel
-            if (app?.ServiceProvider != null)
+            _viewModel = new EmployeeViewModel(employeeService, roleService, auditLogService, currentUserRole);
+            DataContext = _viewModel;
+
+            PasswordBox.PasswordChanged += PasswordBox_PasswordChanged;
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (_viewModel.SelectedEmployee != null && sender is PasswordBox passwordBox)
             {
-                 this.DataContext = new EmployeeViewModel(employeeService, app.ServiceProvider.GetRequiredService<IRoleService>(), currentUserRole);
-            } else
-            {
-                // Handle the case where ServiceProvider is not available, perhaps show an error or log it.
-                // For now, we'll just set DataContext to null or a default ViewModel state.
-                 this.DataContext = null; // Or a ViewModel indicating an error
-                 MessageBox.Show("Application ServiceProvider is not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                _viewModel.Password = passwordBox.SecurePassword;
             }
         }
     }

@@ -47,31 +47,6 @@
             </Setter>
         </Style>
 
-        <!-- Modern Button Style -->
-        <Style x:Key="ModernButton" TargetType="Button">
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Padding" Value="15,10"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#5849BE"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <!-- Card Style -->
         <Style x:Key="CardStyle" TargetType="Border">
             <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
@@ -117,6 +92,12 @@
                             <TextBlock Text="Employees"/>
                         </StackPanel>
                     </Button>
+                    <Button Style="{StaticResource ModernButton}" Click="Payroll_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="💰" Margin="0,0,10,0"/>
+                            <TextBlock Text="Payroll"/>
+                        </StackPanel>
+                    </Button>
                     <Button Style="{StaticResource ModernButton}" Click="Analytics_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📈" Margin="0,0,10,0"/>
@@ -133,6 +114,18 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="⚙" Margin="0,0,10,0"/>
                             <TextBlock Text="Settings"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource ModernButton}" Click="AuditLogs_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📝" Margin="0,0,10,0"/>
+                            <TextBlock Text="Audit Logs"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource ModernButton}" Click="LeaveRequests_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏖️" Margin="0,0,10,0"/>
+                            <TextBlock Text="Leave Requests"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -164,11 +157,14 @@
                     <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="25" Padding="15,8" Margin="0,0,10,0">
                         <TextBlock x:Name="WelcomeText" Text="Welcome!" FontSize="14" Foreground="{DynamicResource AccentBrush}"/>
                     </Border>
-                    <Button Style="{StaticResource ModernButton}" Click="Notification_Click">
+                    <Button x:Name="NotificationButton" 
+                            Style="{StaticResource ModernButton}" 
+                            Click="Notification_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🔔" Margin="0,0,5,0"/>
                         </StackPanel>
                     </Button>
+                    <Button Style="{StaticResource ModernButton}" Content="Test Notification" Click="TestNotification_Click" Margin="0,0,10,0"/>
                     <Button Style="{StaticResource ModernButton}" Content="Logout" Click="Logout_Click"/>
                 </StackPanel>
             </Grid>

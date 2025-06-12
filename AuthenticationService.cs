@@ -37,7 +37,11 @@ namespace EMS.Services
                             Permission.EditEmployees,
                             Permission.ViewReports,
                             Permission.EditRoles,
-                            Permission.ManageUsers
+                            Permission.ManageUsers,
+                            Permission.ViewPayroll,
+                            Permission.EditPayroll,
+                            Permission.GeneratePayroll,
+                            Permission.ViewPayrollHistory
                         }
                     },
                     DateOfBirth = DateTime.MinValue

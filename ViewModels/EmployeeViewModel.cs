@@ -9,6 +9,8 @@ using EMS.Services;
 using System.Windows;
 using System.Linq;
 using System.Collections.Generic;
+using System.Security;
+using EMS.Utils;
 
 namespace EMS.ViewModels
 {
@@ -16,6 +18,7 @@ namespace EMS.ViewModels
     {
         private readonly IEmployeeService _employeeService;
         private readonly IRoleService _roleService;
+        private readonly IAuditLogService _auditLogService;
         private readonly UserRole _currentUserRole;
         private ObservableCollection<Employee> _employees;
         private Employee? _selectedEmployee;
@@ -25,17 +28,19 @@ namespace EMS.ViewModels
         private ObservableCollection<Role> _availableRoles;
         private Role? _selectedRoleForEmployee;
         private bool _isEditingOrAdding;
+        private SecureString? _password;
 
-        public EmployeeViewModel(IEmployeeService employeeService, IRoleService roleService, UserRole currentUserRole)
+        public EmployeeViewModel(IEmployeeService employeeService, IRoleService roleService, IAuditLogService auditLogService, UserRole currentUserRole)
         {
             _employeeService = employeeService;
             _roleService = roleService;
+            _auditLogService = auditLogService;
             _currentUserRole = currentUserRole;
             _employees = new ObservableCollection<Employee>();
             _availableRoles = new ObservableCollection<Role>();
             
             // Initialize commands
-            AddEmployeeCommand = new RelayCommand(AddEmployee);
+            AddEmployeeCommand = new AsyncRelayCommand(AddEmployee);
             UpdateEmployeeCommand = new RelayCommand(EditEmployee, () => SelectedEmployee != null);
             DeleteEmployeeCommand = new RelayCommand(async () => await DeleteEmployee(), () => SelectedEmployee != null);
             SearchCommand = new RelayCommand(async () => await SearchEmployees());
@@ -68,6 +73,7 @@ namespace EMS.ViewModels
                 OnPropertyChanged();
                 SelectedRoleForEmployee = _selectedEmployee?.UserRole != null ? 
                                           AvailableRoles.FirstOrDefault(r => r.RoleName == _selectedEmployee.UserRole.RoleName) : null;
+                Password = null;
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -139,6 +145,17 @@ namespace EMS.ViewModels
             }
         }
 
+        public SecureString? Password
+        {
+            get => _password;
+            set
+            {
+                _password = value;
+                OnPropertyChanged();
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
         public ICommand AddEmployeeCommand { get; }
         public ICommand UpdateEmployeeCommand { get; }
         public ICommand DeleteEmployeeCommand { get; }
@@ -187,6 +204,7 @@ namespace EMS.ViewModels
                         AvailableRoles.Add(role);
                     }
                     SelectedRoleForEmployee = AvailableRoles.FirstOrDefault(r => r.RoleName == "Employee") ?? AvailableRoles.FirstOrDefault();
+                    System.Diagnostics.Debug.WriteLine($"Loaded {AvailableRoles.Count} roles. Selected role: {SelectedRoleForEmployee?.RoleName}");
                 });
             }
             catch (Exception ex)
@@ -227,8 +245,13 @@ namespace EMS.ViewModels
             }
         }
 
-        private void AddEmployee()
+        private async Task AddEmployee()
         {
+            if (!AvailableRoles.Any())
+            {
+                await LoadAvailableRoles();
+            }
+            System.Diagnostics.Debug.WriteLine($"AddEmployee: AvailableRoles count: {AvailableRoles.Count}, SelectedRoleForEmployee: {SelectedRoleForEmployee?.RoleName}");
             SelectedEmployee = new Employee
             {
                 Name = string.Empty,
@@ -246,6 +269,7 @@ namespace EMS.ViewModels
             }
             IsEditingOrAdding = true;
             ErrorMessage = string.Empty;
+            // Password = null; // Commented out to isolate issue with PasswordBox
         }
 
         private void EditEmployee()
@@ -256,6 +280,7 @@ namespace EMS.ViewModels
 
             IsEditingOrAdding = true;
             ErrorMessage = string.Empty;
+            Password = null;
         }
 
         private async Task SaveEmployee()
@@ -277,7 +302,13 @@ namespace EMS.ViewModels
                 bool success;
                 if (string.IsNullOrEmpty(SelectedEmployee.Id))
                 {
-                    SelectedEmployee.Password = BCrypt.Net.BCrypt.HashPassword(GenerateRandomPassword());
+                    if (Password == null || Password.Length == 0)
+                    {
+                        ErrorMessage = "Password is required for a new employee.";
+                        IsLoading = false;
+                        return;
+                    }
+                    SelectedEmployee.Password = BCrypt.Net.BCrypt.HashPassword(new System.Net.NetworkCredential(string.Empty, Password).Password);
 
                     if (string.IsNullOrWhiteSpace(SelectedEmployee.Name) || string.IsNullOrWhiteSpace(SelectedEmployee.Position) ||
                         string.IsNullOrWhiteSpace(SelectedEmployee.Contact) || string.IsNullOrWhiteSpace(SelectedEmployee.Username))
@@ -290,25 +321,55 @@ namespace EMS.ViewModels
                     success = await _employeeService.AddEmployeeAsync(SelectedEmployee);
                     if (success)
                     {
+                        // Log the employee creation
+                        await _auditLogService.LogActionAsync(new AuditLog
+                        {
+                            UserId = _currentUserRole.RoleName,
+                            UserName = "System",
+                            Action = "Create",
+                            EntityType = "Employee",
+                            EntityId = SelectedEmployee.Id,
+                            Details = $"Created new employee: {SelectedEmployee.Name} with role {SelectedEmployee.UserRole.RoleName}",
+                            IpAddress = NetworkUtils.GetLocalIpAddress()
+                        });
                         MessageBox.Show("Employee added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
                 else
                 {
-                    var existingEmployee = await _employeeService.GetEmployeeByIdAsync(SelectedEmployee.Id, _currentUserRole);
-                    if (existingEmployee != null)
+                    if (Password != null && Password.Length > 0)
                     {
-                        SelectedEmployee.Password = existingEmployee.Password;
+                        SelectedEmployee.Password = BCrypt.Net.BCrypt.HashPassword(new System.Net.NetworkCredential(string.Empty, Password).Password);
                     }
                     else
                     {
-                        ErrorMessage = "Could not find the original employee data to update.";
-                        IsLoading = false;
-                        return;
+                        var existingEmployee = await _employeeService.GetEmployeeByIdAsync(SelectedEmployee.Id, _currentUserRole);
+                        if (existingEmployee != null)
+                        {
+                            SelectedEmployee.Password = existingEmployee.Password;
+                        }
+                        else
+                        {
+                            ErrorMessage = "Could not find the original employee data to update.";
+                            IsLoading = false;
+                            return;
+                        }
                     }
+
                     success = await _employeeService.UpdateEmployeeAsync(SelectedEmployee, _currentUserRole);
                     if (success)
                     {
+                        // Log the employee update
+                        await _auditLogService.LogActionAsync(new AuditLog
+                        {
+                            UserId = _currentUserRole.RoleName,
+                            UserName = "System",
+                            Action = "Update",
+                            EntityType = "Employee",
+                            EntityId = SelectedEmployee.Id,
+                            Details = $"Updated employee: {SelectedEmployee.Name} with role {SelectedEmployee.UserRole.RoleName}",
+                            IpAddress = NetworkUtils.GetLocalIpAddress()
+                        });
                         MessageBox.Show("Employee updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
@@ -339,6 +400,7 @@ namespace EMS.ViewModels
             SelectedRoleForEmployee = null;
             IsEditingOrAdding = false;
             ErrorMessage = string.Empty;
+            Password = null;
         }
 
         private async Task DeleteEmployee()
@@ -357,6 +419,18 @@ namespace EMS.ViewModels
 
                 if (await _employeeService.DeleteEmployeeAsync(SelectedEmployee.Id, _currentUserRole))
                 {
+                    // Log the employee deletion
+                    await _auditLogService.LogActionAsync(new AuditLog
+                    {
+                        UserId = _currentUserRole.RoleName,
+                        UserName = "System",
+                        Action = "Delete",
+                        EntityType = "Employee",
+                        EntityId = SelectedEmployee.Id,
+                        Details = $"Deleted employee: {SelectedEmployee.Name}",
+                        IpAddress = NetworkUtils.GetLocalIpAddress()
+                    });
+
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         Employees.Remove(SelectedEmployee);
@@ -395,10 +469,22 @@ namespace EMS.ViewModels
 
                 string newPassword = GenerateRandomPassword();
 
-                SelectedEmployee.Password = newPassword;
+                SelectedEmployee.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
                 if (await _employeeService.UpdateEmployeeAsync(SelectedEmployee, _currentUserRole))
                 {
+                    // Log the password reset
+                    await _auditLogService.LogActionAsync(new AuditLog
+                    {
+                        UserId = _currentUserRole.RoleName,
+                        UserName = "System",
+                        Action = "ResetPassword",
+                        EntityType = "Employee",
+                        EntityId = SelectedEmployee.Id,
+                        Details = $"Reset password for employee: {SelectedEmployee.Name}",
+                        IpAddress = NetworkUtils.GetLocalIpAddress()
+                    });
+
                     MessageBox.Show($"Password for {SelectedEmployee.Username} reset successfully!\nNew password: {newPassword}", 
                         "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     await LoadEmployees();
@@ -420,7 +506,7 @@ namespace EMS.ViewModels
 
         private string GenerateRandomPassword()
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%\"";
             var random = new Random();
             return new string(Enumerable.Repeat(chars, 8)
               .Select(s => s[random.Next(s.Length)]).ToArray());
@@ -446,6 +532,25 @@ namespace EMS.ViewModels
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public static class SecureStringExtensions
+    {
+        public static string ConvertToUnsecureString(this SecureString secureString)
+        {
+            if (secureString == null) return string.Empty;
+
+            IntPtr unmanagedString = IntPtr.Zero;
+            try
+            {
+                unmanagedString = System.Runtime.InteropServices.Marshal.SecureStringToGlobalAllocUnicode(secureString);
+                return System.Runtime.InteropServices.Marshal.PtrToStringUni(unmanagedString)!;
+            }
+            finally
+            {
+                System.Runtime.InteropServices.Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
+            }
         }
     }
 } 

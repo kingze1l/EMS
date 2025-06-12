@@ -25,6 +25,7 @@ namespace EMS
 
         public IMongoCollection<Employee> Employees => _database.GetCollection<Employee>("Employees");
         public IMongoCollection<Notification> Notifications => _database.GetCollection<Notification>("Notifications");
+        public IMongoDatabase Database => _database;
 
         public async Task InitializeAsync()
         {
