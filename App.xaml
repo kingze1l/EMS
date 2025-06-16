@@ -5,6 +5,13 @@
              xmlns:models="clr-namespace:EMS.Models">
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
             <!-- Removed MaterialDesign Merged Dictionaries to standardize on custom theme -->
             
             <!-- Light Theme Colors -->
@@ -234,7 +241,7 @@
 
             <!-- Converters -->
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <converters:BooleanToBrushConverter x:Key="BooleanToBrushConverter"/>
+            <converters:BooleanToBrushConverter x:Key="BooleanToBrushConverter" />
 
             <!-- Role Type Values -->
             <x:Array x:Key="RoleTypeValues" Type="models:RoleType">
