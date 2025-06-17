@@ -14,7 +14,7 @@ namespace EMS.Services
 
         public PayrollService(MongoDbContext dbContext)
         {
-            _employees = dbContext.Database.GetCollection<Employee>("employees");
+            _employees = dbContext.Database.GetCollection<Employee>("Employees");
             _payrollRecords = dbContext.Database.GetCollection<PayrollRecord>("payrollRecords");
         }
 

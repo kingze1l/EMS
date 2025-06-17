@@ -134,6 +134,74 @@ namespace EMS
             }
         }
 
+        private async void FingerprintButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_errorMessage != null)
+            {
+                _errorMessage.Visibility = Visibility.Collapsed;
+            }
+
+            try
+            {
+                // Check if fingerprint is available
+                bool isFingerprintAvailable = await _authService.IsFingerprintAvailableAsync();
+                
+                if (!isFingerprintAvailable)
+                {
+                    ShowError("Fingerprint authentication is not available on this device. Please use username/password login.");
+                    return;
+                }
+
+                // Attempt fingerprint authentication
+                bool isAuthenticated = await _authService.LoginWithFingerprintAsync();
+
+                if (isAuthenticated)
+                {
+                    // Log successful fingerprint login
+                    await _auditLogService.LogActionAsync(new AuditLog
+                    {
+                        UserId = _authService.CurrentUser?.Id ?? "unknown",
+                        UserName = "samiullah",
+                        Action = "FingerprintLogin",
+                        EntityType = "User",
+                        EntityId = _authService.CurrentUser?.Id ?? "unknown",
+                        Details = "Master admin logged in with fingerprint",
+                        IpAddress = NetworkUtils.GetLocalIpAddress()
+                    });
+
+                    var mainWindow = new MainWindow(
+                        _authService,
+                        _employeeService,
+                        _settingsService,
+                        _roleService,
+                        _notificationService,
+                        _auditLogService);
+                    mainWindow.Show();
+                    this.Close();
+                }
+                else
+                {
+                    // Log failed fingerprint attempt
+                    await _auditLogService.LogActionAsync(new AuditLog
+                    {
+                        UserId = "unknown",
+                        UserName = "samiullah",
+                        Action = "FingerprintLoginFailed",
+                        EntityType = "User",
+                        EntityId = "unknown",
+                        Details = "Failed fingerprint authentication attempt",
+                        IpAddress = NetworkUtils.GetLocalIpAddress()
+                    });
+
+                    ShowError("Fingerprint authentication failed. Please try again or use username/password login.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Fingerprint authentication failed: {ex.Message}");
+            }
+        }
+
         private void ShowError(string message)
         {
             if (_errorMessage != null)

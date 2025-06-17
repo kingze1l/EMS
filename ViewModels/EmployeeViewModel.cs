@@ -260,7 +260,10 @@ namespace EMS.ViewModels
                 Username = string.Empty,
                 Password = string.Empty,
                 UserRole = new UserRole { RoleID = 0, RoleName = string.Empty },
-                DateOfBirth = DateTime.Now
+                DateOfBirth = DateTime.Now,
+                BasePay = 0,
+                Bonus = 0,
+                Deductions = 0
             };
             SelectedRoleForEmployee = AvailableRoles.FirstOrDefault(r => r.RoleName == "Employee") ?? AvailableRoles.FirstOrDefault();
             if (SelectedEmployee.UserRole != null && SelectedRoleForEmployee != null)

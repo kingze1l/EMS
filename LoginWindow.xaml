@@ -103,6 +103,14 @@
                     Style="{StaticResource ModernButton}"
                     Click="LoginButton_Click"/>
 
+            <!-- Fingerprint Login for Master Access -->
+            <Button x:Name="FingerprintButton"
+                    Content="🔐 Login with Fingerprint (Master Only)" 
+                    Style="{StaticResource ModernButton}"
+                    Background="#28A745"
+                    Click="FingerprintButton_Click"
+                    Margin="0,5,0,10"/>
+
             <TextBlock x:Name="ErrorMessage"
                        Foreground="Red"
                        TextAlignment="Center"

@@ -104,7 +104,10 @@ namespace EMS
                         RoleName = adminRole.RoleName,
                         Permissions = ConvertPermissionStringsToEnums(adminRole.Permissions)
                     },
-                    DateOfBirth = new DateTime(1980, 5, 15)
+                    DateOfBirth = new DateTime(1980, 5, 15),
+                    BasePay = 120000, // Realistic admin salary
+                    Bonus = 10000,
+                    Deductions = 2000
                 },
                 new Employee
                 {
@@ -119,7 +122,10 @@ namespace EMS
                         RoleName = managerRole.RoleName,
                         Permissions = ConvertPermissionStringsToEnums(managerRole.Permissions)
                     },
-                    DateOfBirth = new DateTime(1985, 3, 10)
+                    DateOfBirth = new DateTime(1985, 3, 10),
+                    BasePay = 95000, // Realistic manager salary
+                    Bonus = 7000,
+                    Deductions = 1500
                 },
                 new Employee
                 {
@@ -134,7 +140,10 @@ namespace EMS
                         RoleName = hrRole.RoleName,
                         Permissions = ConvertPermissionStringsToEnums(hrRole.Permissions)
                     },
-                    DateOfBirth = new DateTime(1990, 8, 22)
+                    DateOfBirth = new DateTime(1990, 8, 22),
+                    BasePay = 75000, // Realistic HR salary
+                    Bonus = 4000,
+                    Deductions = 1200
                 },
                 new Employee
                 {
@@ -149,7 +158,10 @@ namespace EMS
                         RoleName = employeeRole.RoleName,
                         Permissions = ConvertPermissionStringsToEnums(employeeRole.Permissions)
                     },
-                    DateOfBirth = new DateTime(1995, 1, 1)
+                    DateOfBirth = new DateTime(1995, 1, 1),
+                    BasePay = 55000, // Realistic associate salary
+                    Bonus = 2000,
+                    Deductions = 800
                 }
             };
 
