@@ -3,14 +3,312 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              xmlns:local="clr-namespace:EMS.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBlock Text="Dashboard" 
-                 FontSize="24" 
-                 FontWeight="Bold" 
-                 Foreground="{DynamicResource AccentBrush}"
-                 Margin="20"/>
-    </Grid>
+             d:DesignHeight="800" d:DesignWidth="1200">
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header Section -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Dashboard Overview" 
+                             FontSize="28" 
+                             FontWeight="Bold" 
+                             Foreground="{DynamicResource PrimaryHueMidBrush}"
+                             Margin="0,0,0,5"/>
+                    <TextBlock Text="Quick overview of your organization's key metrics and recent activity" 
+                             FontSize="14" 
+                             Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{DynamicResource MaterialDesignIconButton}"
+                            Command="{Binding RefreshCommand}"
+                            ToolTip="Refresh Dashboard"
+                            Margin="0,0,10,0">
+                        <materialDesign:PackIcon Kind="Refresh" Width="20" Height="20"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- Date Range Filter -->
+            <materialDesign:Card Grid.Row="1" Margin="0,0,0,20" Padding="20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" Text="Date Range:" 
+                             VerticalAlignment="Center" 
+                             Margin="0,0,15,0"
+                             FontWeight="SemiBold"/>
+                    
+                    <DatePicker Grid.Column="1" 
+                              SelectedDate="{Binding StartDate}"
+                              materialDesign:HintAssist.Hint="Start Date"
+                              Margin="0,0,15,0"/>
+                    
+                    <TextBlock Grid.Column="2" Text="to" 
+                             VerticalAlignment="Center" 
+                             Margin="0,0,15,0"/>
+                    
+                    <DatePicker Grid.Column="3" 
+                              SelectedDate="{Binding EndDate}"
+                              materialDesign:HintAssist.Hint="End Date"
+                              Margin="0,0,15,0"/>
+                    
+                    <Button Grid.Column="4" 
+                          Content="Apply Filter"
+                          Command="{Binding DateRangeChangedCommand}"
+                          Style="{DynamicResource MaterialDesignRaisedButton}"/>
+                </Grid>
+            </materialDesign:Card>
+
+            <!-- Statistics Cards -->
+            <Grid Grid.Row="2" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Total Employees -->
+                <materialDesign:Card Grid.Column="0" Margin="5" Padding="20">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="AccountGroup" 
+                                               Width="40" Height="40" 
+                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding TotalEmployees}" 
+                                 FontSize="32" FontWeight="Bold"
+                                 Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        <TextBlock Text="Total Employees" 
+                                 FontSize="14" 
+                                 Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Active Admins -->
+                <materialDesign:Card Grid.Column="1" Margin="5" Padding="20">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="ShieldAccount" 
+                                               Width="40" Height="40" 
+                                               Foreground="{DynamicResource SecondaryAccentBrush}"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding ActiveAdmins}" 
+                                 FontSize="32" FontWeight="Bold"
+                                 Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                        <TextBlock Text="Active Admins" 
+                                 FontSize="14" 
+                                 Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Pending Leaves -->
+                <materialDesign:Card Grid.Column="2" Margin="5" Padding="20">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="ClockAlert" 
+                                               Width="40" Height="40" 
+                                               Foreground="{DynamicResource MaterialDesignOrange}"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding PendingLeaves}" 
+                                 FontSize="32" FontWeight="Bold"
+                                 Foreground="{DynamicResource MaterialDesignOrange}"/>
+                        <TextBlock Text="Pending Leaves" 
+                                 FontSize="14" 
+                                 Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Recent Payroll Total -->
+                <materialDesign:Card Grid.Column="3" Margin="5" Padding="20" 
+                                   Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="CurrencyUsd" 
+                                               Width="40" Height="40" 
+                                               Foreground="{DynamicResource MaterialDesignGreen}"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding RecentPayrollTotal, StringFormat=C}" 
+                                 FontSize="24" FontWeight="Bold"
+                                 Foreground="{DynamicResource MaterialDesignGreen}"/>
+                        <TextBlock Text="Recent Payroll" 
+                                 FontSize="14" 
+                                 Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                    </StackPanel>
+                </materialDesign:Card>
+            </Grid>
+
+            <!-- Charts Section -->
+            <Grid Grid.Row="3" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="300"/>
+                </Grid.RowDefinitions>
+
+                <!-- Role Distribution Chart -->
+                <materialDesign:Card Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="5" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="Role Distribution" 
+                                 FontSize="18" FontWeight="Bold"
+                                 Margin="0,0,0,15"/>
+                        <lvc:PieChart Series="{Binding RoleDistributionChart}" 
+                                    LegendLocation="Bottom"
+                                    Height="250"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Leave Status Chart -->
+                <materialDesign:Card Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="Leave Status Overview" 
+                                 FontSize="18" FontWeight="Bold"
+                                 Margin="0,0,0,15"/>
+                        <lvc:CartesianChart Series="{Binding LeaveStatusChart}" 
+                                          Height="250">
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Count" />
+                            </lvc:CartesianChart.AxisY>
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Title="Status" 
+                                        Labels="Pending,Approved,Rejected" />
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
+                    </StackPanel>
+                </materialDesign:Card>
+            </Grid>
+
+            <!-- Payroll Trend Chart (Admin Only) -->
+            <materialDesign:Card Grid.Row="4" Margin="5" Padding="20" 
+                               Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Payroll Trends" 
+                             FontSize="18" FontWeight="Bold"
+                             Margin="0,0,0,15"/>
+                    <lvc:CartesianChart Series="{Binding PayrollTrendChart}" 
+                                      Height="250">
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="Total Payroll ($)" />
+                        </lvc:CartesianChart.AxisY>
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Title="Month" />
+                        </lvc:CartesianChart.AxisX>
+                    </lvc:CartesianChart>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- Recent Activity Section -->
+            <Grid Grid.Row="5" Margin="0,20,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Recent Payroll Records -->
+                <materialDesign:Card Grid.Column="0" Margin="5" Padding="20" 
+                                   Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="Recent Payroll Records" 
+                                 FontSize="18" FontWeight="Bold"
+                                 Margin="0,0,0,15"/>
+                        <ListView ItemsSource="{Binding RecentPayrollRecords}" 
+                                MaxHeight="200"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding EmployeeName}" 
+                                                     FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding PaymentDate, StringFormat='MMM dd, yyyy'}" 
+                                                     FontSize="12" 
+                                                     Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" 
+                                                 Text="{Binding NetPay, StringFormat=C}" 
+                                                 FontWeight="SemiBold"
+                                                 VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Recent Leave Requests -->
+                <materialDesign:Card Grid.Column="1" Margin="5" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="Recent Leave Requests" 
+                                 FontSize="18" FontWeight="Bold"
+                                 Margin="0,0,0,15"/>
+                        <ListView ItemsSource="{Binding RecentLeaveRequests}" 
+                                MaxHeight="200"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding EmployeeName}" 
+                                                     FontWeight="SemiBold"/>
+                                            <TextBlock FontSize="12" 
+                                                     Foreground="{DynamicResource MaterialDesignBodyLight}">
+                                                <Run Text="{Binding StartDate, StringFormat='MMM dd'}"/>
+                                                <Run Text=" - "/>
+                                                <Run Text="{Binding EndDate, StringFormat='MMM dd, yyyy'}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <Border Grid.Column="1" 
+                                              Background="{Binding Status, Converter={StaticResource StatusToBrushConverter}}"
+                                              CornerRadius="10"
+                                              Padding="8,4">
+                                            <TextBlock Text="{Binding Status}" 
+                                                     FontSize="10" 
+                                                     Foreground="White"
+                                                     FontWeight="SemiBold"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </materialDesign:Card>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
 </UserControl> 

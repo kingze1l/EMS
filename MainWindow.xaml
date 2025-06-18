@@ -3,29 +3,57 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
-    Title="Employee Management" Height="600" Width="1000" 
-    Background="{DynamicResource BackgroundBrush}" WindowStartupLocation="CenterScreen">
+    Title="Employee Management" Height="700" Width="1200" 
+    Background="{DynamicResource BackgroundBrush}" 
+    WindowStartupLocation="CenterScreen"
+    WindowState="Maximized">
 
     <Window.Resources>
-        <!-- Define DropShadowEffect Resource -->
-        <DropShadowEffect x:Key="DropShadowEffect" BlurRadius="10" ShadowDepth="1" Opacity="0.2"/>
+        <!-- Navigation Animation -->
+        <Storyboard x:Key="PageTransition">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                           From="0" To="1" Duration="0:0:0.3" 
+                           AccelerationRatio="0.3" DecelerationRatio="0.7"/>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
+                           From="50" To="0" Duration="0:0:0.3" 
+                           AccelerationRatio="0.3" DecelerationRatio="0.7"/>
+        </Storyboard>
 
-        <!-- Modern TextBox Style -->
+        <!-- Sidebar Animation -->
+        <Storyboard x:Key="SidebarExpand">
+            <DoubleAnimation Storyboard.TargetProperty="Width" 
+                           From="250" To="280" Duration="0:0:0.2" 
+                           AccelerationRatio="0.3" DecelerationRatio="0.7"/>
+        </Storyboard>
+
+        <Storyboard x:Key="SidebarCollapse">
+            <DoubleAnimation Storyboard.TargetProperty="Width" 
+                           From="280" To="250" Duration="0:0:0.2" 
+                           AccelerationRatio="0.3" DecelerationRatio="0.7"/>
+        </Storyboard>
+
+        <!-- Modern Search Box Style -->
         <Style x:Key="SearchBoxStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource GlassBackground}"/>
             <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border Background="{TemplateBinding Background}"
                                 CornerRadius="25"
-                                Padding="{TemplateBinding Padding}">
+                                Padding="{TemplateBinding Padding}"
+                                x:Name="border">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#4A90E2" BlurRadius="0" ShadowDepth="0"/>
+                            </Border.Effect>
                             <Grid>
                                 <TextBlock Text="🔍 Search Employee"
-                                        Foreground="#999"
-                                        Margin="2,0,0,0">
+                                        Foreground="#80FFFFFF"
+                                        Margin="2,0,0,0"
+                                        VerticalAlignment="Center">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
@@ -39,21 +67,88 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <ScrollViewer x:Name="PART_ContentHost"/>
+                                <ScrollViewer x:Name="PART_ContentHost" 
+                                            Margin="15,0,15,0"
+                                            VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#4A90E2" BlurRadius="15" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- Card Style -->
-        <Style x:Key="CardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="Effect" Value="{StaticResource DropShadowEffect}"/>
+        <!-- Navigation Button Style -->
+        <Style x:Key="NavigationButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundSecondaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="Margin" Value="5,2"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}"
+                                x:Name="border">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#15FFFFFF"/>
+                                <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#25FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Active Navigation Button Style -->
+        <Style x:Key="ActiveNavigationButton" TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+            <Setter Property="Background" Value="#20FFFFFF"/>
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}"
+                                x:Name="border">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#4A90E2" BlurRadius="10" ShadowDepth="0"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#30FFFFFF"/>
+                                <Setter Property="Foreground" Value="{DynamicResource AccentSecondaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#40FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- Boolean to Visibility Converter -->
@@ -62,74 +157,116 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="250" x:Name="SidebarColumn"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Left Sidebar -->
-        <Border Background="{DynamicResource BackgroundBrush}" Effect="{StaticResource DropShadowEffect}">
+        <Border Grid.Column="0" 
+              Background="{DynamicResource GlassBackground}" 
+              BorderBrush="{DynamicResource BorderBrush}"
+              BorderThickness="0,0,1,0">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.2"/>
+            </Border.Effect>
             <StackPanel>
-                <Image Source="/EMS;component/Assets/people_icon.png" Width="60" Height="60" Margin="20,30"/>
-                <TextBlock Text="EMS" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" 
-                        HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <!-- Logo Section -->
+                <StackPanel Margin="20,30,20,20">
+                    <Image Source="/EMS;component/Assets/people_icon.png" 
+                         Width="50" Height="50" 
+                         Margin="0,0,0,10"
+                         RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Text="EMS" 
+                             FontSize="20" 
+                             FontWeight="Bold" 
+                             Foreground="{DynamicResource AccentBrush}" 
+                             HorizontalAlignment="Center"/>
+                </StackPanel>
 
-                <StackPanel Margin="15,20">
-                    <Button Style="{StaticResource ModernButton}" Click="Dashboard_Click">
+                <!-- Navigation Menu -->
+                <StackPanel Margin="15,10">
+                    <Button x:Name="DashboardButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="Dashboard_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📊" Margin="0,0,10,0"/>
+                            <TextBlock Text="📊" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Dashboard"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="Attendance_Click">
+                    
+                    <Button x:Name="AttendanceButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="Attendance_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📅" Margin="0,0,10,0"/>
+                            <TextBlock Text="📅" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Attendance"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="Employees_Click">
+                    
+                    <Button x:Name="EmployeesButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="Employees_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="👥" Margin="0,0,10,0"/>
+                            <TextBlock Text="👥" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Employees"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="Payroll_Click">
+                    
+                    <Button x:Name="PayrollButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="Payroll_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="💰" Margin="0,0,10,0"/>
+                            <TextBlock Text="💰" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Payroll"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="Analytics_Click">
+                    
+                    <Button x:Name="AnalyticsButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="Analytics_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📈" Margin="0,0,10,0"/>
+                            <TextBlock Text="📈" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Analytics"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="Report_Click">
+                    
+                    <Button x:Name="ReportButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="Report_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="✍" Margin="0,0,10,0"/>
+                            <TextBlock Text="✍" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Report"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="Settings_Click">
+                    
+                    <Button x:Name="SettingsButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="Settings_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚙" Margin="0,0,10,0"/>
+                            <TextBlock Text="⚙" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Settings"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="AuditLogs_Click">
+                    
+                    <Button x:Name="AuditLogsButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="AuditLogs_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📝" Margin="0,0,10,0"/>
+                            <TextBlock Text="📝" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Audit Logs"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource ModernButton}" Click="LeaveRequests_Click">
+                    
+                    <Button x:Name="LeaveRequestsButton" 
+                          Style="{StaticResource NavigationButton}" 
+                          Click="LeaveRequests_Click">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🏖️" Margin="0,0,10,0"/>
+                            <TextBlock Text="🏖️" Margin="0,0,12,0" FontSize="16"/>
                             <TextBlock Text="Leave Requests"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
-        </StackPanel>
+            </StackPanel>
         </Border>
 
         <!-- Main Content -->
@@ -141,45 +278,84 @@
             </Grid.RowDefinitions>
 
             <!-- Top Header -->
-            <Grid Margin="20,20,20,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <Border Grid.Row="0" 
+                  Background="{DynamicResource GlassBackground}" 
+                  Margin="20,20,20,10" 
+                  CornerRadius="15"
+                  BorderBrush="{DynamicResource BorderBrush}"
+                  BorderThickness="1">
+                <Grid Margin="20,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="25" Width="300" HorizontalAlignment="Left">
-                    <TextBox x:Name="SearchBox"
-                            Style="{StaticResource SearchBoxStyle}"
-                            TextChanged="Search_TextChanged"/>
-                </Border>
-
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="25" Padding="15,8" Margin="0,0,10,0">
-                        <TextBlock x:Name="WelcomeText" Text="Welcome!" FontSize="14" Foreground="{DynamicResource AccentBrush}"/>
+                    <!-- Search Box -->
+                    <Border Background="Transparent" 
+                          Width="350" 
+                          HorizontalAlignment="Left">
+                        <TextBox x:Name="SearchBox"
+                                Style="{StaticResource SearchBoxStyle}"
+                                TextChanged="Search_TextChanged"/>
                     </Border>
-                    <Button x:Name="NotificationButton" 
-                            Style="{StaticResource ModernButton}" 
-                            Click="Notification_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🔔" Margin="0,0,5,0"/>
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{StaticResource ModernButton}" Content="Test Notification" Click="TestNotification_Click" Margin="0,0,10,0"/>
-                    <Button Style="{StaticResource ModernButton}" Content="Logout" Click="Logout_Click"/>
-                </StackPanel>
-            </Grid>
+
+                    <!-- User Info and Actions -->
+                    <StackPanel Grid.Column="1" 
+                              Orientation="Horizontal" 
+                              VerticalAlignment="Center">
+                        <Border Background="{DynamicResource GlassBackground}" 
+                              CornerRadius="20" 
+                              Padding="15,8" 
+                              Margin="0,0,15,0"
+                              BorderBrush="{DynamicResource BorderBrush}"
+                              BorderThickness="1">
+                            <TextBlock x:Name="WelcomeText" 
+                                     Text="Welcome!" 
+                                     FontSize="14" 
+                                     Foreground="{DynamicResource AccentBrush}"/>
+                        </Border>
+                        
+                        <Button x:Name="NotificationButton" 
+                              Style="{StaticResource ActionButton}" 
+                              Click="Notification_Click"
+                              Padding="12,8"
+                              Margin="0,0,10,0">
+                            <TextBlock Text="🔔" FontSize="16"/>
+                        </Button>
+                        
+                        <Button Style="{StaticResource ActionButton}" 
+                              Content="Test Notification" 
+                              Click="TestNotification_Click" 
+                              Margin="0,0,10,0"/>
+                        
+                        <Button Style="{StaticResource ErrorButton}" 
+                              Content="Logout" 
+                              Click="Logout_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
 
             <!-- Admin Panel (hidden unless user has permission) -->
-            <StackPanel x:Name="AdminPanel" Orientation="Horizontal" Margin="20,10,20,0" Grid.Row="1" Visibility="Collapsed">
-                <Button Content="Role Management" Style="{StaticResource ModernButton}" Click="RoleManagement_Click"/>
-                <!-- Add more admin-only controls here -->
+            <StackPanel x:Name="AdminPanel" 
+                      Orientation="Horizontal" 
+                      Margin="20,0,20,10" 
+                      Grid.Row="1" 
+                      Visibility="Collapsed">
+                <Button Content="Role Management" 
+                      Style="{StaticResource ActionButton}" 
+                      Click="RoleManagement_Click"/>
             </StackPanel>
 
-            <!-- Content Frame -->
+            <!-- Content Frame with Animation -->
             <Frame x:Name="MainFrame" 
-                   Grid.Row="2" 
-                   NavigationUIVisibility="Hidden"
-                   Background="Transparent"/>
+                 Grid.Row="2" 
+                 NavigationUIVisibility="Hidden"
+                 Background="Transparent"
+                 RenderTransformOrigin="0.5,0.5">
+                <Frame.RenderTransform>
+                    <TranslateTransform/>
+                </Frame.RenderTransform>
+            </Frame>
         </Grid>
     </Grid>
 </Window>

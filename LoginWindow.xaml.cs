@@ -79,6 +79,8 @@ namespace EMS
                 return;
             }
 
+            ShowLoading(true);
+
             try
             {
                 bool isAuthenticated = await _authService.LoginAsync(username, password);
@@ -132,40 +134,46 @@ namespace EMS
             {
                 ShowError($"Login failed: {ex.Message}");
             }
+            finally
+            {
+                ShowLoading(false);
+            }
         }
 
-        private async void FingerprintButton_Click(object sender, RoutedEventArgs e)
+        private async void BiometricButton_Click(object sender, RoutedEventArgs e)
         {
             if (_errorMessage != null)
             {
                 _errorMessage.Visibility = Visibility.Collapsed;
             }
 
+            ShowLoading(true);
+
             try
             {
-                // Check if fingerprint is available
-                bool isFingerprintAvailable = await _authService.IsFingerprintAvailableAsync();
+                // Check if biometric authentication is available
+                bool isBiometricAvailable = await _authService.IsBiometricAvailableAsync();
                 
-                if (!isFingerprintAvailable)
+                if (!isBiometricAvailable)
                 {
-                    ShowError("Fingerprint authentication is not available on this device. Please use username/password login.");
+                    ShowError("Biometric authentication is not available on this device. Please use username/password login.");
                     return;
                 }
 
-                // Attempt fingerprint authentication
-                bool isAuthenticated = await _authService.LoginWithFingerprintAsync();
+                // Attempt biometric authentication
+                bool isAuthenticated = await _authService.LoginWithBiometricAsync();
 
                 if (isAuthenticated)
                 {
-                    // Log successful fingerprint login
+                    // Log successful biometric login
                     await _auditLogService.LogActionAsync(new AuditLog
                     {
                         UserId = _authService.CurrentUser?.Id ?? "unknown",
                         UserName = "samiullah",
-                        Action = "FingerprintLogin",
+                        Action = "BiometricLogin",
                         EntityType = "User",
                         EntityId = _authService.CurrentUser?.Id ?? "unknown",
-                        Details = "Master admin logged in with fingerprint",
+                        Details = "Master admin logged in with biometric authentication",
                         IpAddress = NetworkUtils.GetLocalIpAddress()
                     });
 
@@ -181,24 +189,28 @@ namespace EMS
                 }
                 else
                 {
-                    // Log failed fingerprint attempt
+                    // Log failed biometric attempt
                     await _auditLogService.LogActionAsync(new AuditLog
                     {
                         UserId = "unknown",
                         UserName = "samiullah",
-                        Action = "FingerprintLoginFailed",
+                        Action = "BiometricLoginFailed",
                         EntityType = "User",
                         EntityId = "unknown",
-                        Details = "Failed fingerprint authentication attempt",
+                        Details = "Failed biometric authentication attempt",
                         IpAddress = NetworkUtils.GetLocalIpAddress()
                     });
 
-                    ShowError("Fingerprint authentication failed. Please try again or use username/password login.");
+                    ShowError("Biometric authentication failed. Please try again or use username/password login.");
                 }
             }
             catch (Exception ex)
             {
-                ShowError($"Fingerprint authentication failed: {ex.Message}");
+                ShowError($"Biometric authentication failed: {ex.Message}");
+            }
+            finally
+            {
+                ShowLoading(false);
             }
         }
 
@@ -208,6 +220,39 @@ namespace EMS
             {
                 _errorMessage.Text = message;
                 _errorMessage.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void ShowLoading(bool show)
+        {
+            var loadingIndicator = FindName("LoadingIndicator") as StackPanel;
+            var loginForm = FindName("LoginForm") as StackPanel;
+            var loginButton = FindName("LoginButton") as Button;
+            var biometricButton = FindName("BiometricButton") as Button;
+
+            if (loadingIndicator != null)
+            {
+                loadingIndicator.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            if (loginForm != null)
+            {
+                loginForm.Opacity = show ? 0.5 : 1.0;
+            }
+
+            if (loginButton != null)
+            {
+                loginButton.IsEnabled = !show;
+            }
+
+            if (biometricButton != null)
+            {
+                biometricButton.IsEnabled = !show;
             }
         }
     }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace EMS.Services
 {
-    public class FingerprintService
+    public class BiometricService
     {
         public async Task<bool> AuthenticateMasterAsync()
         {
@@ -14,9 +14,9 @@ namespace EMS.Services
                 
                 if (availability == UserConsentVerifierAvailability.Available)
                 {
-                    // Request fingerprint verification
+                    // Request biometric verification (fingerprint or face)
                     var result = await UserConsentVerifier.RequestVerificationAsync(
-                        "Please verify your fingerprint for master access");
+                        "Please verify your biometric (fingerprint or face) for master access");
                     
                     return result == UserConsentVerificationResult.Verified;
                 }
@@ -25,11 +25,11 @@ namespace EMS.Services
             }
             catch
             {
-                return false; // Fingerprint authentication failed
+                return false; // Biometric authentication failed
             }
         }
 
-        public async Task<bool> IsFingerprintAvailableAsync()
+        public async Task<bool> IsBiometricAvailableAsync()
         {
             try
             {

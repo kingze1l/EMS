@@ -51,13 +51,16 @@ namespace EMS
 
             // Register application services
             services.AddSingleton<IEmployeeService, EmployeeService>();
+            services.AddSingleton<EmployeeService>();
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<AuthenticationService>();
             services.AddSingleton<IRoleService, RoleService>();
             services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<IAuditLogService, AuditLogService>();
             services.AddSingleton<ILeaveService, LeaveService>();
+            services.AddSingleton<LeaveService>();
             services.AddSingleton<IPayrollService, PayrollService>();
+            services.AddSingleton<PayrollService>();
             services.AddTransient<PayrollView>();
             services.AddSingleton<MainWindow>();
             services.AddSingleton<LoginWindow>();

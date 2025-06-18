@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Collections.ObjectModel;
 using EMS.Services;
 using EMS.Views;
@@ -24,6 +25,7 @@ namespace EMS
         private readonly IAuditLogService _auditLogService;
         private Frame? _mainFrame;
         private readonly DispatcherTimer _notificationUpdateTimer;
+        private Button? _currentActiveButton;
 
         public MainWindow(
             AuthenticationService authService,
@@ -58,6 +60,74 @@ namespace EMS
             // Set up notifications and update UI for current user
             SetupNotifications();
             UpdateUIForCurrentUser();
+            
+            // Set Dashboard as default active page
+            var dashboardButton = FindName("DashboardButton") as Button;
+            SetActiveButton(dashboardButton);
+            Dashboard_Click(null, null);
+        }
+
+        private void SetActiveButton(Button? activeButton)
+        {
+            // Reset all navigation buttons to normal style
+            ResetNavigationButtons();
+            
+            if (activeButton != null)
+            {
+                // Set the active button style
+                activeButton.Style = FindResource("ActiveNavigationButton") as Style;
+                _currentActiveButton = activeButton;
+            }
+        }
+
+        private void ResetNavigationButtons()
+        {
+            var buttonNames = new[]
+            {
+                "DashboardButton", "AttendanceButton", "EmployeesButton", "PayrollButton",
+                "AnalyticsButton", "ReportButton", "SettingsButton", "AuditLogsButton", "LeaveRequestsButton"
+            };
+
+            foreach (var buttonName in buttonNames)
+            {
+                if (FindName(buttonName) is Button button)
+                {
+                    button.Style = FindResource("NavigationButton") as Style;
+                }
+            }
+        }
+
+        private async void AnimatePageTransition(Func<Task> navigationAction)
+        {
+            if (_mainFrame == null) return;
+
+            // Fade out current content
+            var fadeOut = new DoubleAnimation
+            {
+                From = 1.0,
+                To = 0.0,
+                Duration = TimeSpan.FromMilliseconds(150),
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
+            };
+
+            fadeOut.Completed += async (s, e) =>
+            {
+                // Perform navigation
+                await navigationAction();
+
+                // Fade in new content
+                var fadeIn = new DoubleAnimation
+                {
+                    From = 0.0,
+                    To = 1.0,
+                    Duration = TimeSpan.FromMilliseconds(300),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
+                };
+
+                _mainFrame.BeginAnimation(OpacityProperty, fadeIn);
+            };
+
+            _mainFrame.BeginAnimation(OpacityProperty, fadeOut);
         }
 
         private void UpdateUIForCurrentUser()
@@ -97,12 +167,16 @@ namespace EMS
 
         private void Dashboard_Click(object sender, RoutedEventArgs e)
         {
-            if (_mainFrame != null)
+            var dashboardButton = FindName("DashboardButton") as Button;
+            SetActiveButton(dashboardButton);
+            AnimatePageTransition(async () =>
             {
-                // Assuming Dashboard is accessible to all logged-in users
-                // TODO: Navigate to Dashboard view
-                _mainFrame.Content = null; 
-            }
+                if (_mainFrame != null)
+                {
+                    // Dashboard is accessible to all logged-in users
+                    _mainFrame.Content = new DashboardView();
+                }
+            });
         }
 
         private void Attendance_Click(object sender, RoutedEventArgs e)
@@ -110,11 +184,16 @@ namespace EMS
             // Check for Attendance permission
             if (_authService != null && _authService.HasPermission(EMS.Models.Permission.ViewReports))
             {
-                 if (_mainFrame != null)
+                var attendanceButton = FindName("AttendanceButton") as Button;
+                SetActiveButton(attendanceButton);
+                AnimatePageTransition(async () =>
                 {
-                    // TODO: Navigate to Attendance view
-                    _mainFrame.Content = null;
-                }
+                    if (_mainFrame != null)
+                    {
+                        // TODO: Navigate to Attendance view
+                        _mainFrame.Content = null;
+                    }
+                });
             }
             else if (_authService != null)
             {
@@ -127,22 +206,27 @@ namespace EMS
             // Check for ViewEmployees permission
             if (_authService != null && _authService.HasPermission(EMS.Models.Permission.ViewEmployees))
             {
-                if (_mainFrame != null && _authService.CurrentUser != null && _employeeService != null)
+                var employeesButton = FindName("EmployeesButton") as Button;
+                SetActiveButton(employeesButton);
+                AnimatePageTransition(async () =>
                 {
-                    var app = Application.Current as App;
-                    if (app?.ServiceProvider != null)
+                    if (_mainFrame != null && _authService.CurrentUser != null && _employeeService != null)
                     {
-                        var roleService = app.ServiceProvider.GetRequiredService<IRoleService>();
-                        var auditLogService = app.ServiceProvider.GetRequiredService<IAuditLogService>();
+                        var app = Application.Current as App;
+                        if (app?.ServiceProvider != null)
+                        {
+                            var roleService = app.ServiceProvider.GetRequiredService<IRoleService>();
+                            var auditLogService = app.ServiceProvider.GetRequiredService<IAuditLogService>();
 
-                        _mainFrame.Content = new EmployeeView(
-                            _employeeService,
-                            roleService,
-                            auditLogService,
-                            _authService.CurrentUser.UserRole
-                        );
+                            _mainFrame.Content = new EmployeeView(
+                                _employeeService,
+                                roleService,
+                                auditLogService,
+                                _authService.CurrentUser.UserRole
+                            );
+                        }
                     }
-                }
+                });
             }
             else if (_authService != null)
             {
@@ -155,11 +239,16 @@ namespace EMS
             // Check for ViewReports permission
             if (_authService != null && _authService.HasPermission(EMS.Models.Permission.ViewReports))
             {
-                if (_mainFrame != null)
+                var analyticsButton = FindName("AnalyticsButton") as Button;
+                SetActiveButton(analyticsButton);
+                AnimatePageTransition(async () =>
                 {
-                    // TODO: Navigate to Analytics view
-                    _mainFrame.Content = null;
-                }
+                    if (_mainFrame != null)
+                    {
+                        // TODO: Navigate to Analytics view
+                        _mainFrame.Content = null;
+                    }
+                });
             }
             else if (_authService != null)
             {
@@ -172,11 +261,16 @@ namespace EMS
             // Check for ViewReports permission
             if (_authService != null && _authService.HasPermission(EMS.Models.Permission.ViewReports))
             {
-                if (_mainFrame != null)
+                var reportButton = FindName("ReportButton") as Button;
+                SetActiveButton(reportButton);
+                AnimatePageTransition(async () =>
                 {
-                    // TODO: Navigate to Report view
-                    _mainFrame.Content = null;
-                }
+                    if (_mainFrame != null)
+                    {
+                        // TODO: Navigate to Report view
+                        _mainFrame.Content = null;
+                    }
+                });
             }
             else if (_authService != null)
             {
@@ -189,70 +283,85 @@ namespace EMS
             // Check for ManageUsers permission (assuming settings includes user management or requires admin-level access)
             if (_authService != null && _authService.HasPermission(EMS.Models.Permission.ManageUsers))
             {
-                if (_mainFrame != null && _authService.CurrentUser != null)
+                var settingsButton = FindName("SettingsButton") as Button;
+                SetActiveButton(settingsButton);
+                AnimatePageTransition(async () =>
                 {
-                    try
+                    if (_mainFrame != null && _authService.CurrentUser != null)
                     {
-                        var app = Application.Current as App;
-                        var settingsView = app?.ServiceProvider.GetRequiredService<SettingsView>();
-                        if (settingsView != null)
+                        try
                         {
-                            var viewModel = new EMS.ViewModels.SettingsViewModel(
-                                _settingsService,
-                                _authService.CurrentUser.Id,
-                                _authService.IsUserInRole("Admin")
-                            );
-                            settingsView.DataContext = viewModel;
-                            _mainFrame.Content = settingsView;
+                            var app = Application.Current as App;
+                            var settingsView = app?.ServiceProvider.GetRequiredService<SettingsView>();
+                            if (settingsView != null)
+                            {
+                                var viewModel = new EMS.ViewModels.SettingsViewModel(
+                                    _settingsService,
+                                    _authService.CurrentUser.Id,
+                                    _authService.IsUserInRole("Admin")
+                                );
+                                settingsView.DataContext = viewModel;
+                                _mainFrame.Content = settingsView;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error creating Settings view: {ex.Message}", "Error");
                         }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show($"Error creating Settings view: {ex.Message}", "Error");
+                        MessageBox.Show("Required services or user information is missing.", "Error");
                     }
-                }
-                else
-                {
-                    MessageBox.Show("Required services or user information is missing.", "Error");
-                }
+                });
             }
             else if (_authService != null)
             {
-                MessageBox.Show("You do not have permission to view Settings.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("You do not have permission to access Settings.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
         private void AuditLogs_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new AuditLogView(_auditLogService));
+            var auditLogsButton = FindName("AuditLogsButton") as Button;
+            SetActiveButton(auditLogsButton);
+            AnimatePageTransition(async () =>
+            {
+                MainFrame.Navigate(new AuditLogView(_auditLogService));
+            });
         }
 
         private void LeaveRequests_Click(object sender, RoutedEventArgs e)
         {
-            if (_mainFrame != null && _authService?.CurrentUser != null)
+            var leaveRequestsButton = FindName("LeaveRequestsButton") as Button;
+            SetActiveButton(leaveRequestsButton);
+            AnimatePageTransition(async () =>
             {
-                var app = Application.Current as App;
-                if (app?.ServiceProvider != null)
+                if (_mainFrame != null && _authService?.CurrentUser != null)
                 {
-                    var leaveService = app.ServiceProvider.GetRequiredService<ILeaveService>();
-                    var auditLogService = app.ServiceProvider.GetRequiredService<IAuditLogService>();
-                    var employeeService = app.ServiceProvider.GetRequiredService<IEmployeeService>();
-                    var currentUser = _authService.CurrentUser;
-                    var currentUserRole = currentUser.UserRole;
+                    var app = Application.Current as App;
+                    if (app?.ServiceProvider != null)
+                    {
+                        var leaveService = app.ServiceProvider.GetRequiredService<ILeaveService>();
+                        var auditLogService = app.ServiceProvider.GetRequiredService<IAuditLogService>();
+                        var employeeService = app.ServiceProvider.GetRequiredService<IEmployeeService>();
+                        var currentUser = _authService.CurrentUser;
+                        var currentUserRole = currentUser.UserRole;
 
-                    _mainFrame.Content = new LeaveRequestView(
-                        leaveService,
-                        auditLogService,
-                        employeeService,
-                        currentUser.Id,
-                        currentUserRole
-                    );
+                        _mainFrame.Content = new LeaveRequestView(
+                            leaveService,
+                            auditLogService,
+                            employeeService,
+                            currentUser.Id,
+                            currentUserRole
+                        );
+                    }
                 }
-            }
-            else
-            {
-                MessageBox.Show("User not authenticated or services not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                else
+                {
+                    MessageBox.Show("User not authenticated or services not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            });
         }
 
         private void Logout_Click(object sender, RoutedEventArgs e)
@@ -445,27 +554,33 @@ namespace EMS
 
         private void Payroll_Click(object sender, RoutedEventArgs e)
         {
+            // Check for Payroll permission
             if (_authService != null && _authService.HasPermission(EMS.Models.Permission.ViewPayroll))
             {
-                if (_mainFrame != null && _authService.CurrentUser != null)
+                var payrollButton = FindName("PayrollButton") as Button;
+                SetActiveButton(payrollButton);
+                AnimatePageTransition(async () =>
                 {
-                    var app = Application.Current as App;
-                    if (app?.ServiceProvider != null)
+                    if (_mainFrame != null && _authService.CurrentUser != null)
                     {
-                        var payrollService = app.ServiceProvider.GetRequiredService<IPayrollService>();
-                        var employeeService = app.ServiceProvider.GetRequiredService<IEmployeeService>();
-                        var auditLogService = app.ServiceProvider.GetRequiredService<IAuditLogService>();
-                        var payrollView = app.ServiceProvider.GetRequiredService<EMS.Views.PayrollView>();
-                        var viewModel = new EMS.ViewModels.PayrollViewModel(
-                            payrollService,
-                            employeeService,
-                            auditLogService,
-                            _authService.CurrentUser
-                        );
-                        payrollView.DataContext = viewModel;
-                        _mainFrame.Content = payrollView;
+                        var app = Application.Current as App;
+                        if (app?.ServiceProvider != null)
+                        {
+                            var payrollService = app.ServiceProvider.GetRequiredService<IPayrollService>();
+                            var employeeService = app.ServiceProvider.GetRequiredService<IEmployeeService>();
+                            var auditLogService = app.ServiceProvider.GetRequiredService<IAuditLogService>();
+
+                            var viewModel = new PayrollViewModel(
+                                payrollService,
+                                employeeService,
+                                auditLogService,
+                                _authService.CurrentUser
+                            );
+
+                            _mainFrame.Content = new PayrollView(viewModel);
+                        }
                     }
-                }
+                });
             }
             else if (_authService != null)
             {

@@ -9,12 +9,16 @@
              d:DesignHeight="600" d:DesignWidth="1000">
     
     <UserControl.Resources>
-        <Style x:Key="RoleCardStyle" TargetType="materialDesign:Card">
+        <Style x:Key="RoleCardStyle" TargetType="Border">
             <Setter Property="Margin" Value="8"/>
             <Setter Property="Padding" Value="16"/>
-            <Setter Property="UniformCornerRadius" Value="8"/>
-            <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
-            <Setter Property="materialDesign:ElevationAssist.Elevation" Value="Dp2"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="{DynamicResource GlassBackground}"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.2"/>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="PermissionGroupStyle" TargetType="Expander">
@@ -35,32 +39,29 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <materialDesign:Card Grid.Row="0" Style="{StaticResource RoleCardStyle}">
+        <Border Grid.Row="0" Style="{StaticResource RoleCardStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
                 <TextBlock Text="Role Management"
-                         Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                         FontSize="20"
+                         FontWeight="Bold"
                          VerticalAlignment="Center"/>
-
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                             materialDesign:HintAssist.Hint="Search roles..."
-                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
                              Width="200"
-                             Margin="0,0,8,0"/>
-
+                             Margin="0,0,8,0"
+                             Style="{DynamicResource ModernTextBox}"/>
                     <Button Command="{Binding AddRoleCommand}"
-                            Style="{StaticResource MaterialDesignFloatingActionButton}"
+                            Style="{StaticResource ActionButton}"
                             ToolTip="Add New Role">
-                        <materialDesign:PackIcon Kind="Plus" Height="24" Width="24"/>
+                        <TextBlock Text="+" FontSize="18"/>
                     </Button>
                 </StackPanel>
             </Grid>
-        </materialDesign:Card>
+        </Border>
 
         <!-- Main Content -->
         <Grid Grid.Row="1" Margin="16">
@@ -70,101 +71,60 @@
             </Grid.ColumnDefinitions>
 
             <!-- Role List -->
-            <materialDesign:Card Grid.Column="0" Style="{StaticResource RoleCardStyle}">
+            <Border Grid.Column="0" Style="{StaticResource RoleCardStyle}">
                 <DockPanel>
                     <TextBlock Text="Roles"
-                             Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                             FontSize="16"
+                             FontWeight="Bold"
                              DockPanel.Dock="Top"
                              Margin="0,0,0,16"/>
-
                     <ScrollViewer>
                         <ItemsControl ItemsSource="{Binding Roles}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <materialDesign:Card Margin="0,4" 
-                                                       Style="{StaticResource RoleCardStyle}"
-                                                       Background="{Binding IsSystemRole, Converter={StaticResource BooleanToBrushConverter}}">
+                                    <Border Margin="0,4" Style="{StaticResource RoleCardStyle}">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
-
-                                            <TextBlock Text="{Binding RoleName}"
-                                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"/>
-
-                                            <TextBlock Grid.Row="1" 
-                                                     Text="{Binding Type}"
-                                                     Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                                     Margin="0,4"/>
-
-                                            <TextBlock Grid.Row="2"
-                                                     Text="{Binding Description}"
-                                                     Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                                     TextWrapping="Wrap"
-                                                     Margin="0,4"/>
-
-                                            <materialDesign:PackIcon Grid.Row="0" 
-                                                                   Grid.Column="1"
-                                                                   Kind="Lock"
-                                                                   Visibility="{Binding IsSystemRole, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                   HorizontalAlignment="Right"
-                                                                   VerticalAlignment="Top"/>
+                                            <TextBlock Text="{Binding RoleName}" FontWeight="SemiBold"/>
+                                            <TextBlock Grid.Row="1" Text="{Binding Type}" Margin="0,4"/>
+                                            <TextBlock Grid.Row="2" Text="{Binding Description}" TextWrapping="Wrap" Margin="0,4"/>
                                         </Grid>
-                                    </materialDesign:Card>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
                 </DockPanel>
-            </materialDesign:Card>
+            </Border>
 
             <!-- Role Details -->
-            <materialDesign:Card Grid.Column="1" 
-                               Style="{StaticResource RoleCardStyle}"
-                               Margin="16,0,0,0">
+            <Border Grid.Column="1" Style="{StaticResource RoleCardStyle}" Margin="16,0,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
                     <!-- Role Header -->
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="Role Details"
-                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
-
-                        <StackPanel Grid.Column="1" 
-                                  Orientation="Horizontal"
-                                  Visibility="{Binding IsViewing, Converter={StaticResource BooleanToVisibilityConverter}}">
-                            <Button Command="{Binding EditRoleCommand}"
-                                    Style="{StaticResource MaterialDesignOutlinedButton}"
-                                    Margin="0,0,8,0"
-                                    IsEnabled="{Binding CanEditRole}">
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="Pencil" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Edit"/>
-                                </StackPanel>
+                        <TextBlock Text="Role Details" FontWeight="Bold" FontSize="16"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding IsViewing, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Button Command="{Binding EditRoleCommand}" Style="{StaticResource ActionButton}" Margin="0,0,8,0" IsEnabled="{Binding CanEditRole}">
+                                <TextBlock Text="Edit"/>
                             </Button>
-
-                            <Button Command="{Binding DeleteRoleCommand}"
-                                    Style="{StaticResource MaterialDesignOutlinedButton}"
-                                    IsEnabled="{Binding CanDeleteRole}">
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="Delete" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Delete"/>
-                                </StackPanel>
+                            <Button Command="{Binding DeleteRoleCommand}" Style="{StaticResource ActionButton}" IsEnabled="{Binding CanDeleteRole}">
+                                <TextBlock Text="Delete"/>
                             </Button>
                         </StackPanel>
                     </Grid>
-
                     <!-- Role Details Form -->
                     <Grid Grid.Row="1" Margin="0,16">
                         <Grid.RowDefinitions>
@@ -173,35 +133,28 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-
                         <!-- Role Name -->
                         <TextBox Grid.Row="0"
                                 Text="{Binding SelectedRole.RoleName, UpdateSourceTrigger=PropertyChanged}"
-                                materialDesign:HintAssist.Hint="Role Name"
-                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                Style="{DynamicResource ModernTextBox}"
                                 IsEnabled="{Binding IsEditing}"
                                 Margin="0,0,0,16"/>
-
                         <!-- Role Type -->
                         <ComboBox Grid.Row="1"
                                  ItemsSource="{Binding Source={StaticResource RoleTypeValues}}"
                                  SelectedItem="{Binding SelectedRole.Type}"
-                                 materialDesign:HintAssist.Hint="Role Type"
-                                 Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                 Style="{DynamicResource SettingComboBoxStyle}"
                                  IsEnabled="{Binding IsEditing}"
                                  Margin="0,0,0,16"/>
-
                         <!-- Description -->
                         <TextBox Grid.Row="2"
                                 Text="{Binding SelectedRole.Description, UpdateSourceTrigger=PropertyChanged}"
-                                materialDesign:HintAssist.Hint="Description"
-                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                Style="{DynamicResource ModernTextBox}"
                                 TextWrapping="Wrap"
                                 AcceptsReturn="True"
                                 Height="60"
                                 IsEnabled="{Binding IsEditing}"
                                 Margin="0,0,0,16"/>
-
                         <!-- Permissions -->
                         <ScrollViewer Grid.Row="3">
                             <ItemsControl ItemsSource="{Binding PermissionGroups}">
@@ -209,8 +162,7 @@
                                     <DataTemplate>
                                         <Expander Style="{StaticResource PermissionGroupStyle}">
                                             <Expander.Header>
-                                                <TextBlock Text="{Binding Category}"
-                                                         Style="{StaticResource MaterialDesignSubtitle1TextBlock}"/>
+                                                <TextBlock Text="{Binding Category}" FontWeight="SemiBold"/>
                                             </Expander.Header>
                                             <ItemsControl ItemsSource="{Binding Permissions}">
                                                 <ItemsControl.ItemTemplate>
@@ -228,31 +180,17 @@
                             </ItemsControl>
                         </ScrollViewer>
                     </Grid>
-
                     <!-- Action Buttons -->
-                    <StackPanel Grid.Row="2" 
-                              Orientation="Horizontal" 
-                              HorizontalAlignment="Right"
-                              Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Button Command="{Binding SaveRoleCommand}"
-                                Style="{StaticResource MaterialDesignRaisedButton}"
-                                Margin="0,0,8,0">
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="ContentSave" Margin="0,0,8,0"/>
-                                <TextBlock Text="Save"/>
-                            </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Button Command="{Binding SaveRoleCommand}" Style="{StaticResource ActionButton}" Margin="0,0,8,0">
+                            <TextBlock Text="Save"/>
                         </Button>
-
-                        <Button Command="{Binding CancelEditCommand}"
-                                Style="{StaticResource MaterialDesignOutlinedButton}">
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Close" Margin="0,0,8,0"/>
-                                <TextBlock Text="Cancel"/>
-                            </StackPanel>
+                        <Button Command="{Binding CancelEditCommand}" Style="{StaticResource ActionButton}">
+                            <TextBlock Text="Cancel"/>
                         </Button>
                     </StackPanel>
                 </Grid>
-            </materialDesign:Card>
+            </Border>
         </Grid>
     </Grid>
 </UserControl> 

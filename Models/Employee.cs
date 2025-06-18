@@ -43,10 +43,10 @@ namespace EMS.Models
         public decimal Bonus { get; set; }
         public decimal Deductions { get; set; }
         
-        // Fingerprint authentication properties
-        public bool FingerprintEnabled { get; set; } = false;
-        public string? FingerprintUserId { get; set; }  // Windows Hello user ID
-        public DateTime? FingerprintEnrolledDate { get; set; }
+        // Biometric authentication properties
+        public bool BiometricEnabled { get; set; } = false;
+        public string? BiometricUserId { get; set; }  // Windows Hello user ID
+        public DateTime? BiometricEnrolledDate { get; set; }
     }
 }
 

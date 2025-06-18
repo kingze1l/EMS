@@ -7,13 +7,13 @@ namespace EMS.Services
     public class AuthenticationService
     {
         private readonly IMongoCollection<Employee> _employeeCollection;
-        private readonly FingerprintService _fingerprintService;
+        private readonly BiometricService _biometricService;
         private Employee? _currentUser;
 
         public AuthenticationService(MongoDbContext dbContext)
         {
             _employeeCollection = dbContext.Employees;
-            _fingerprintService = new FingerprintService();
+            _biometricService = new BiometricService();
         }
 
         public Employee? CurrentUser => _currentUser;
@@ -62,10 +62,10 @@ namespace EMS.Services
             return false;
         }
 
-        public async Task<bool> LoginWithFingerprintAsync()
+        public async Task<bool> LoginWithBiometricAsync()
         {
-            // Only allow fingerprint login for master admin
-            bool isAuthenticated = await _fingerprintService.AuthenticateMasterAsync();
+            // Only allow biometric login for master admin
+            bool isAuthenticated = await _biometricService.AuthenticateMasterAsync();
             
             if (isAuthenticated)
             {
@@ -76,7 +76,7 @@ namespace EMS.Services
                     Position = "Master Admin",
                     Contact = "N/A",
                     Username = "samiullah",
-                    Password = "fingerprint_authenticated",
+                    Password = "biometric_authenticated",
                     UserRole = new UserRole {
                         RoleID = 0,
                         RoleName = "Admin",
@@ -100,9 +100,9 @@ namespace EMS.Services
             return false;
         }
 
-        public async Task<bool> IsFingerprintAvailableAsync()
+        public async Task<bool> IsBiometricAvailableAsync()
         {
-            return await _fingerprintService.IsFingerprintAvailableAsync();
+            return await _biometricService.IsBiometricAvailableAsync();
         }
 
         public void Logout()
