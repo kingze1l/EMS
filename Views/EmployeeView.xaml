@@ -5,8 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="clr-namespace:EMS.ViewModels"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
-    Title="Employee Management">
+    Title="Employee Management"
+    Background="{DynamicResource BackgroundBrush}">
 
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -21,43 +23,51 @@
         </Grid.RowDefinitions>
 
         <!-- Header with Search and Actions -->
-        <Grid Grid.Row="0" Background="{DynamicResource BackgroundBrush}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="0" 
+                Style="{StaticResource CardStyle}"
+                Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Search Box -->
-            <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="0" Width="300" HorizontalAlignment="Left">
+                <!-- Search Box -->
                 <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                         Padding="5" BorderThickness="1"/>
-            </Border>
+                         Style="{StaticResource ModernTextBox}"
+                         Width="300" 
+                         HorizontalAlignment="Left"
+                         materialDesign:HintAssist.Hint="Search employees..."/>
 
-            <!-- Action Buttons -->
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="Search" 
-                        Command="{Binding SearchCommand}"
-                        Margin="5" Padding="5"/>
-                <Button Content="Add Employee" 
-                        Command="{Binding AddEmployeeCommand}"
-                        Margin="5" Padding="5"/>
-                <Button Content="Refresh" 
-                        Command="{Binding RefreshCommand}"
-                        Margin="5" Padding="5"/>
-            </StackPanel>
-        </Grid>
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Search" 
+                            Command="{Binding SearchCommand}"
+                            Style="{StaticResource ModernButton}"
+                            Margin="5"/>
+                    <Button Content="Add Employee" 
+                            Command="{Binding AddEmployeeCommand}"
+                            Style="{StaticResource ModernButton}"
+                            Margin="5"/>
+                    <Button Content="Refresh" 
+                            Command="{Binding RefreshCommand}"
+                            Style="{StaticResource ModernButton}"
+                            Margin="5"/>
+                </StackPanel>
+            </Grid>
+        </Border>
 
         <!-- Edit/Add Employee Section -->
         <Border Grid.Row="1" 
-                Background="{DynamicResource BackgroundBrush}"
-                Margin="0,10"
-                Padding="10"
+                Style="{StaticResource CardStyle}"
+                Margin="0,0,0,20"
                 Visibility="{Binding IsEditingOrAdding, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel>
                 <TextBlock Text="Employee Details"
                            FontSize="18"
                            FontWeight="Bold"
-                           Margin="0,0,0,10"/>
+                           Foreground="{DynamicResource AccentBrush}"
+                           Margin="0,0,0,15"/>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -73,36 +83,72 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedEmployee.Name, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+                    <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0" 
+                             Margin="0,5" VerticalAlignment="Center"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" 
+                           Text="{Binding SelectedEmployee.Name, UpdateSourceTrigger=PropertyChanged}" 
+                           Style="{StaticResource ModernTextBox}"
+                           Margin="5"/>
 
-                    <TextBlock Text="Position:" Grid.Row="1" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedEmployee.Position, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+                    <TextBlock Text="Position:" Grid.Row="1" Grid.Column="0" 
+                             Margin="0,5" VerticalAlignment="Center"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" 
+                           Text="{Binding SelectedEmployee.Position, UpdateSourceTrigger=PropertyChanged}" 
+                           Style="{StaticResource ModernTextBox}"
+                           Margin="5"/>
 
-                    <TextBlock Text="Contact:" Grid.Row="2" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedEmployee.Contact, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+                    <TextBlock Text="Contact:" Grid.Row="2" Grid.Column="0" 
+                             Margin="0,5" VerticalAlignment="Center"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" 
+                           Text="{Binding SelectedEmployee.Contact, UpdateSourceTrigger=PropertyChanged}" 
+                           Style="{StaticResource ModernTextBox}"
+                           Margin="5"/>
 
-                    <TextBlock Text="Username:" Grid.Row="3" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
-                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedEmployee.Username, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+                    <TextBlock Text="Username:" Grid.Row="3" Grid.Column="0" 
+                             Margin="0,5" VerticalAlignment="Center"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" 
+                           Text="{Binding SelectedEmployee.Username, UpdateSourceTrigger=PropertyChanged}" 
+                           Style="{StaticResource ModernTextBox}"
+                           Margin="5"/>
 
                     <!-- Role Selection Dropdown -->
-                    <TextBlock Text="Role:" Grid.Row="4" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
+                    <TextBlock Text="Role:" Grid.Row="4" Grid.Column="0" 
+                             Margin="0,5" VerticalAlignment="Center"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
                     <ComboBox Grid.Row="4" Grid.Column="1"
                               ItemsSource="{Binding AvailableRoles}"
                               SelectedItem="{Binding SelectedRoleForEmployee}"
                               DisplayMemberPath="RoleName"
+                              Style="{StaticResource ModernComboBox}"
                               Margin="5"/>
 
                     <!-- Password Field -->
-                    <TextBlock Text="Password:" Grid.Row="5" Grid.Column="0" Margin="0,5" VerticalAlignment="Center"/>
-                    <PasswordBox x:Name="PasswordBox" Grid.Row="5" Grid.Column="1" Margin="5" Padding="5"/>
+                    <TextBlock Text="Password:" Grid.Row="5" Grid.Column="0" 
+                             Margin="0,5" VerticalAlignment="Center"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                    <PasswordBox x:Name="PasswordBox" Grid.Row="5" Grid.Column="1" 
+                               Style="{StaticResource ModernPasswordBox}"
+                               Margin="5"/>
 
                 </Grid>
 
                 <!-- Save/Cancel Buttons -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-                    <Button Content="Save" Command="{Binding SaveEmployeeCommand}" Margin="5" Padding="5"/>
-                    <Button Content="Cancel" Command="{Binding CancelEditCommand}" Margin="5" Padding="5"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                    <Button Content="Save" 
+                           Command="{Binding SaveEmployeeCommand}" 
+                           Style="{StaticResource ModernButton}"
+                           MinWidth="90" Height="36"
+                           Margin="5"/>
+                    <Button Content="Cancel" 
+                           Command="{Binding CancelEditCommand}" 
+                           Style="{StaticResource ModernButton}"
+                           Background="Gray"
+                           MinWidth="90" Height="36"
+                           Margin="5"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -116,9 +162,7 @@
 
         <!-- Employee List -->
         <Border Grid.Row="3" 
-                Background="{DynamicResource BackgroundBrush}"
-                Margin="0,10"
-                Padding="10">
+                Style="{StaticResource CardStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -129,6 +173,7 @@
                 <ProgressBar IsIndeterminate="True" 
                            Height="2" 
                            Margin="0,0,0,10"
+                           Style="{StaticResource ModernProgressBar}"
                            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                 <!-- Employee DataGrid -->
@@ -138,7 +183,10 @@
                          AutoGenerateColumns="False"
                          IsReadOnly="False"
                          CanUserAddRows="False"
-                         CanUserDeleteRows="False">
+                         CanUserDeleteRows="False"
+                         Style="{StaticResource ModernDataGrid}"
+                         ColumnWidth="*"
+                         Loaded="EmployeeDataGrid_Loaded">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" 
                                           Binding="{Binding Name}" 
@@ -165,15 +213,22 @@
                                         <Button Content="Update"
                                                 Command="{Binding DataContext.UpdateEmployeeCommand, 
                                                           RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                Margin="5" Padding="5"/>
+                                                Style="{StaticResource ModernButton}"
+                                                MinWidth="90" Height="36"
+                                                Margin="5"/>
                                         <Button Content="Reset Password"
                                                 Command="{Binding DataContext.ResetPasswordCommand, 
                                                           RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                Margin="5" Padding="5"/>
+                                                Style="{StaticResource ModernButton}"
+                                                MinWidth="90" Height="36"
+                                                Margin="5"/>
                                         <Button Content="Delete"
                                                 Command="{Binding DataContext.DeleteEmployeeCommand, 
                                                           RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                Margin="5" Padding="5"/>
+                                                Style="{StaticResource ModernButton}"
+                                                Background="Red"
+                                                MinWidth="90" Height="36"
+                                                Margin="5"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

@@ -4,9 +4,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:EMS.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="900">
-    <Grid Background="{DynamicResource BackgroundBrush}">
+             d:DesignHeight="600" d:DesignWidth="900"
+             Background="{DynamicResource BackgroundBrush}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -14,14 +16,30 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Orientation="Horizontal" Margin="20,20,20,10" Grid.Row="0" VerticalAlignment="Center">
-            <TextBlock Text="Payroll Management" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
-            <TextBox Width="200" Margin="30,0,0,0" VerticalAlignment="Center" 
-                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
-                     ToolTip="Search by employee name"/>
-            <Button Content="Search" Margin="10,0,0,0" Command="{Binding SearchCommand}"/>
-            <Button Content="Reload" Margin="10,0,0,0" Command="{Binding LoadPayrollRecordsCommand}"/>
-        </StackPanel>
+        <Border Grid.Row="0" 
+                Style="{StaticResource CardStyle}"
+                Margin="20,20,20,10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Payroll Management" 
+                         FontSize="24" 
+                         FontWeight="Bold" 
+                         Foreground="{DynamicResource AccentBrush}"/>
+                <TextBox Width="200" 
+                       Margin="30,0,0,0" 
+                       VerticalAlignment="Center" 
+                       Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                       Style="{StaticResource ModernTextBox}"
+                       materialDesign:HintAssist.Hint="Search by employee name"/>
+                <Button Content="Search" 
+                      Margin="10,0,0,0" 
+                      Command="{Binding SearchCommand}"
+                      Style="{StaticResource ModernButton}"/>
+                <Button Content="Reload" 
+                      Margin="10,0,0,0" 
+                      Command="{Binding LoadPayrollRecordsCommand}"
+                      Style="{StaticResource ModernButton}"/>
+            </StackPanel>
+        </Border>
 
         <!-- Main Content -->
         <Grid Grid.Row="1" Margin="20,0,20,0">
@@ -31,13 +49,18 @@
             </Grid.ColumnDefinitions>
 
             <!-- Payroll Records Table -->
-            <DataGrid ItemsSource="{Binding PayrollRecords}" SelectedItem="{Binding SelectedPayrollRecord, Mode=TwoWay}"
-                      AutoGenerateColumns="False" IsReadOnly="True" Grid.Column="0" Margin="0,0,10,0"
-                      RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="False" 
-                      SelectionMode="Single" SelectionUnit="FullRow"
-                      Background="{DynamicResource BackgroundBrush}"
-                      BorderBrush="{DynamicResource AccentBrush}"
-                      GridLinesVisibility="Horizontal">
+            <DataGrid ItemsSource="{Binding PayrollRecords}" 
+                    SelectedItem="{Binding SelectedPayrollRecord, Mode=TwoWay}"
+                    AutoGenerateColumns="False" 
+                    IsReadOnly="True" 
+                    Grid.Column="0" 
+                    Margin="0,0,10,0"
+                    RowHeaderWidth="0" 
+                    CanUserAddRows="False" 
+                    CanUserDeleteRows="False" 
+                    SelectionMode="Single" 
+                    SelectionUnit="FullRow"
+                    Style="{StaticResource ModernDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
                     <DataGridTextColumn Header="Date" Binding="{Binding PaymentDate, StringFormat=yyyy-MM-dd}" Width="*"/>
@@ -49,41 +72,108 @@
             </DataGrid>
 
             <!-- Employee Pay Details and Actions -->
-            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Top">
-                <TextBlock Text="Employee Pay Details" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                <ComboBox ItemsSource="{Binding Employees}" SelectedItem="{Binding SelectedEmployee, Mode=TwoWay}"
-                          DisplayMemberPath="Name" Width="200" Margin="0,0,0,10"/>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Base Pay:" Width="80" VerticalAlignment="Center"/>
-                    <TextBox Width="100" Text="{Binding SelectedEmployeeBasePay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Border Grid.Column="1" 
+                    Style="{StaticResource CardStyle}"
+                    Margin="10,0,0,0" 
+                    VerticalAlignment="Top">
+                <StackPanel>
+                    <TextBlock Text="Employee Pay Details" 
+                             FontWeight="Bold" 
+                             FontSize="16" 
+                             Foreground="{DynamicResource AccentBrush}"
+                             Margin="0,0,0,10"/>
+                    <ComboBox ItemsSource="{Binding Employees}" 
+                           SelectedItem="{Binding SelectedEmployee, Mode=TwoWay}"
+                           DisplayMemberPath="Name" 
+                           Width="200" 
+                           Style="{StaticResource ModernComboBox}"
+                           Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <TextBlock Text="Base Pay:" 
+                                 Width="80" 
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource ForegroundBrush}"/>
+                        <TextBox Width="100" 
+                               Text="{Binding SelectedEmployeeBasePay, UpdateSourceTrigger=PropertyChanged}"
+                               Style="{StaticResource ModernTextBox}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <TextBlock Text="Bonus:" 
+                                 Width="80" 
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource ForegroundBrush}"/>
+                        <TextBox Width="100" 
+                               Text="{Binding SelectedEmployeeBonus, UpdateSourceTrigger=PropertyChanged}"
+                               Style="{StaticResource ModernTextBox}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                        <TextBlock Text="Deductions:" 
+                                 Width="80" 
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource ForegroundBrush}"/>
+                        <TextBox Width="100" 
+                               Text="{Binding SelectedEmployeeDeductions, UpdateSourceTrigger=PropertyChanged}"
+                               Style="{StaticResource ModernTextBox}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="Net Pay:" 
+                                 Width="80" 
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource ForegroundBrush}"/>
+                        <TextBlock Text="{Binding SelectedEmployeeNetPay, StringFormat=C}" 
+                                 FontWeight="Bold"
+                                 Foreground="{DynamicResource AccentBrush}"/>
+                    </StackPanel>
+                    <Button Content="Update Pay Details" 
+                          Command="{Binding UpdateEmployeePayCommand}" 
+                          Style="{StaticResource ModernButton}"
+                          Margin="0,0,0,5"/>
+                    <Button Content="Generate Payroll" 
+                          Command="{Binding GeneratePayrollCommand}" 
+                          Style="{StaticResource ModernButton}"
+                          Margin="0,0,0,5"/>
+                    <Button Content="Generate Payroll for All" 
+                          Command="{Binding GenerateBulkPayrollCommand}" 
+                          Style="{StaticResource ModernButton}"
+                          Margin="0,0,0,5"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Bonus:" Width="80" VerticalAlignment="Center"/>
-                    <TextBox Width="100" Text="{Binding SelectedEmployeeBonus, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                    <TextBlock Text="Deductions:" Width="80" VerticalAlignment="Center"/>
-                    <TextBox Width="100" Text="{Binding SelectedEmployeeDeductions, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <TextBlock Text="Net Pay:" Width="80" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding SelectedEmployeeNetPay, StringFormat=C}" FontWeight="Bold"/>
-                </StackPanel>
-                <Button Content="Update Pay Details" Command="{Binding UpdateEmployeePayCommand}" Margin="0,0,0,5"/>
-                <Button Content="Generate Payroll" Command="{Binding GeneratePayrollCommand}" Margin="0,0,0,5"/>
-                <Button Content="Generate Payroll for All" Command="{Binding GenerateBulkPayrollCommand}" Margin="0,0,0,5"/>
-            </StackPanel>
+            </Border>
         </Grid>
 
         <!-- Footer: Total Payroll and Status -->
-        <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="20,10,20,20" VerticalAlignment="Center">
-            <TextBlock Text="Total Payroll for Period:" FontWeight="Bold" VerticalAlignment="Center"/>
-            <DatePicker SelectedDate="{Binding StartDate}" Margin="10,0,0,0" Width="120"/>
-            <TextBlock Text="to" Margin="5,0,5,0" VerticalAlignment="Center"/>
-            <DatePicker SelectedDate="{Binding EndDate}" Width="120"/>
-            <Button Content="Calculate" Command="{Binding CalculateTotalCommand}" Margin="10,0,0,0"/>
-            <TextBlock Text="{Binding TotalPayroll, StringFormat=C}" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"/>
-            <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource AccentBrush}" Margin="30,0,0,0" VerticalAlignment="Center"/>
-        </StackPanel>
+        <Border Grid.Row="2" 
+                Style="{StaticResource CardStyle}"
+                Margin="20,10,20,20">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Total Payroll for Period:" 
+                         FontWeight="Bold" 
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource ForegroundBrush}"/>
+                <DatePicker SelectedDate="{Binding StartDate}" 
+                         Margin="10,0,0,0" 
+                         Width="120"
+                         Style="{StaticResource ModernDatePicker}"/>
+                <TextBlock Text="to" 
+                         Margin="5,0,5,0" 
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource ForegroundBrush}"/>
+                <DatePicker SelectedDate="{Binding EndDate}" 
+                         Width="120"
+                         Style="{StaticResource ModernDatePicker}"/>
+                <Button Content="Calculate" 
+                      Command="{Binding CalculateTotalCommand}" 
+                      Margin="10,0,0,0"
+                      Style="{StaticResource ModernButton}"/>
+                <TextBlock Text="{Binding TotalPayroll, StringFormat=C}" 
+                         FontWeight="Bold" 
+                         Margin="10,0,0,0" 
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource AccentBrush}"/>
+                <TextBlock Text="{Binding StatusMessage}" 
+                         Foreground="{DynamicResource AccentBrush}" 
+                         Margin="30,0,0,0" 
+                         VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl> 

@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:EMS.Views"
              xmlns:converters="clr-namespace:EMS.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{DynamicResource BackgroundBrush}">
     <UserControl.Resources>
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </UserControl.Resources>
@@ -18,8 +19,8 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Background="{DynamicResource BackgroundBrush}" 
-                CornerRadius="10" 
+        <Border Grid.Row="0"
+                Style="{StaticResource CardStyle}"
                 Margin="10" 
                 Padding="15">
             <StackPanel>
@@ -39,8 +40,7 @@
             <ItemsControl x:Name="NotificationsList">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{DynamicResource BackgroundBrush}"
-                                CornerRadius="10"
+                        <Border Style="{StaticResource CardStyle}"
                                 Margin="0,5"
                                 Padding="15">
                             <Grid>
@@ -58,7 +58,8 @@
                                 <StackPanel Grid.Row="0" Grid.Column="0">
                                     <TextBlock Text="{Binding Title}" 
                                              FontWeight="Bold" 
-                                             FontSize="16"/>
+                                             FontSize="16"
+                                             Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBlock Text="{Binding Type}" 
                                              Foreground="{DynamicResource AccentBrush}"
                                              Margin="0,5,0,0"/>
@@ -74,6 +75,7 @@
                                 <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                          Text="{Binding Message}"
                                          TextWrapping="Wrap"
+                                         Foreground="{DynamicResource ForegroundBrush}"
                                          Margin="0,10,0,0"/>
 
                                 <!-- Action Button -->

@@ -14,33 +14,36 @@
     <UserControl.Resources>
         <!-- Card Style -->
         <!-- REMOVING THIS STYLE AND OTHERS TO MOVE TO APP.XAML -->
-        
-        
+
+
     </UserControl.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
 
         <!-- Header -->
-        <TextBlock Text="Leave Requests"
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                   Text="Leave Requests"
                    FontSize="24"
                    FontWeight="Bold"
                    Foreground="{DynamicResource AccentBrush}"
                    Margin="0,0,0,20"/>
 
-        <!-- Submit New Leave Request Section -->
-        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+        <!-- Submit New Leave Request (Left Card) -->
+        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,20,0">
             <StackPanel>
                 <TextBlock Text="Submit New Leave Request"
                            FontSize="18"
                            FontWeight="Bold"
+                           Foreground="{DynamicResource AccentBrush}"
                            Margin="0,0,0,15"/>
-
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -52,49 +55,64 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Start Date:" Style="{StaticResource SettingLabelStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <DatePicker Grid.Row="0" Grid.Column="1"
                                 SelectedDate="{Binding NewLeaveRequest.StartDate, Mode=TwoWay}"
+                                Style="{StaticResource ModernDatePicker}"
                                 Margin="0,0,20,0"/>
-
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="End Date:" Style="{StaticResource SettingLabelStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <DatePicker Grid.Row="0" Grid.Column="3"
-                                SelectedDate="{Binding NewLeaveRequest.EndDate, Mode=TwoWay}"/>
-
+                                SelectedDate="{Binding NewLeaveRequest.EndDate, Mode=TwoWay}"
+                                Style="{StaticResource ModernDatePicker}"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Reason:" Style="{StaticResource SettingLabelStyle}" VerticalAlignment="Top" Margin="0,10,10,0"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
                              Text="{Binding NewLeaveRequest.Reason, Mode=TwoWay}"
+                             Style="{StaticResource ModernTextBox}"
                              Height="60"
                              TextWrapping="Wrap"
                              AcceptsReturn="True"
                              VerticalScrollBarVisibility="Auto"
                              Margin="0,5,0,0"/>
                 </Grid>
-
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-                    <Button Content="Submit Request" Command="{Binding SubmitLeaveCommand}" Style="{StaticResource ActionButton}" Margin="0,0,10,0"/>
-                    <Button Content="Clear Form" Command="{Binding ResetFormCommand}" Style="{StaticResource ActionButton}" Background="Gray"/>
+                    <Button Content="Submit Request" 
+                           Command="{Binding SubmitLeaveCommand}" 
+                           Style="{StaticResource ModernButton}" 
+                           MinWidth="100"
+                           Margin="0,0,10,0"/>
+                    <Button Content="Clear Form" 
+                           Command="{Binding ResetFormCommand}" 
+                           Style="{StaticResource ModernButton}" 
+                           Background="Gray"
+                           MinWidth="100"/>
                 </StackPanel>
+                <ProgressBar IsIndeterminate="True" Height="5" Margin="0,10,0,0" Style="{StaticResource ModernProgressBar}" Visibility="{Binding IsLoading}"/>
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="0,10,0,0" TextWrapping="Wrap" Visibility="{Binding ErrorMessage}"/>
+                <TextBlock Text="{Binding SuccessMessage}" Foreground="LightGreen" Margin="0,10,0,0" TextWrapping="Wrap" Visibility="{Binding SuccessMessage}"/>
             </StackPanel>
         </Border>
 
-        <!-- Loading Indicator and Messages -->
-        <ProgressBar Grid.Row="2" IsIndeterminate="True" Height="5" Margin="10,10,10,0" Visibility="{Binding IsLoading}"/>
-        <TextBlock Grid.Row="2" Text="{Binding ErrorMessage}" Foreground="Red" Margin="10,10,10,0" TextWrapping="Wrap" Visibility="{Binding ErrorMessage}"/>
-        <TextBlock Grid.Row="2" Text="{Binding SuccessMessage}" Foreground="Green" Margin="10,10,10,0" TextWrapping="Wrap" Visibility="{Binding SuccessMessage}"/>
-
-        <!-- Leave Requests List (For Managers/Admins and Employees to view their own) -->
-        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,20,0,0">
+        <!-- All Leave Requests (Right Card) -->
+        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardStyle}">
             <StackPanel>
                 <TextBlock Text="All Leave Requests"
                            FontSize="18"
                            FontWeight="Bold"
+                           Foreground="{DynamicResource AccentBrush}"
                            Margin="0,0,0,15"/>
-
                 <DataGrid ItemsSource="{Binding LeaveRequests}"
                           AutoGenerateColumns="False"
-                          IsReadOnly="True">
+                          IsReadOnly="True"
+                          Style="{StaticResource ModernDataGrid}"
+                          Height="340"
+                          VerticalScrollBarVisibility="Auto"
+                          RowHeight="48"
+                          ClipToBounds="False">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="ClipToBounds" Value="False"/>
+                        </Style>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Employee Name" Binding="{Binding EmployeeName}" Width="*"/>
                         <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="Auto"/>
@@ -113,7 +131,7 @@
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Status}" Value="Approved">
                                                         <Setter Property="Text" Value="✅ Approved"/>
-                                                        <Setter Property="Foreground" Value="Green"/>
+                                                        <Setter Property="Foreground" Value="LightGreen"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Status}" Value="Rejected">
                                                         <Setter Property="Text" Value="❌ Rejected"/>
@@ -128,25 +146,33 @@
                         </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Requested On" Binding="{Binding RequestedDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="Auto"/>
                         <DataGridTextColumn Header="Manager Comments" Binding="{Binding ManagerComments}" Width="2*"/>
-                        
-                        <!-- Manager Actions (Visible only to Admins/Managers/HR) -->
-                        <DataGridTemplateColumn Header="Actions" Width="Auto">
+                        <DataGridTemplateColumn Header="Actions" Width="200">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button Content="Approve"
+                                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" Content="Approve"
                                                 Command="{Binding DataContext.ApproveLeaveCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding}"
-                                                Style="{StaticResource ActionButton}"
-                                                Visibility="{Binding DataContext.CanManageLeaves, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Margin="0,0,5,0"/>
-                                        <Button Content="Reject"
+                                                Style="{StaticResource ModernButton}"
+                                                MinWidth="90" Height="36"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,8,0"
+                                                Visibility="{Binding DataContext.CanManageLeaves, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        <Button Grid.Column="1" Content="Reject"
                                                 Command="{Binding DataContext.RejectLeaveCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding}"
-                                                Style="{StaticResource ActionButton}"
+                                                Style="{StaticResource ModernButton}"
                                                 Background="Red"
+                                                MinWidth="90" Height="36"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Center"
                                                 Visibility="{Binding DataContext.CanManageLeaves, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                    </StackPanel>
+                                    </Grid>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

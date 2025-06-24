@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EMS.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{DynamicResource BackgroundBrush}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -15,8 +16,8 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Background="{DynamicResource BackgroundBrush}" 
-                CornerRadius="10" 
+        <Border Grid.Row="0"
+                Style="{StaticResource CardStyle}"
                 Margin="10" 
                 Padding="15">
             <Grid>
@@ -31,6 +32,7 @@
                 <Button Grid.Column="1" 
                         Content="Refresh" 
                         Click="RefreshButton_Click" 
+                        Style="{StaticResource ModernButton}"
                         Margin="0,0,0,0"/>
             </Grid>
         </Border>
@@ -40,6 +42,7 @@
                      IsIndeterminate="True" 
                      Height="2" 
                      Margin="10,0" 
+                     Style="{StaticResource ModernProgressBar}"
                      Visibility="{Binding IsLoading}"/>
 
         <!-- Error Message -->
@@ -50,48 +53,57 @@
                    Visibility="{Binding ErrorMessage}"/>
 
         <!-- Filters -->
-        <Grid Grid.Row="2" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="2" 
+                Style="{StaticResource CardStyle}"
+                Margin="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Date Range -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <DatePicker x:Name="StartDatePicker" 
-                          SelectedDate="{Binding StartDate, Mode=TwoWay}"
-                          Margin="0,0,10,0"/>
-                <TextBlock Text="to" 
-                         VerticalAlignment="Center" 
-                         Margin="0,0,10,0"/>
-                <DatePicker x:Name="EndDatePicker"
-                          SelectedDate="{Binding EndDate, Mode=TwoWay}"/>
-            </StackPanel>
+                <!-- Date Range -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <DatePicker x:Name="StartDatePicker" 
+                              SelectedDate="{Binding StartDate, Mode=TwoWay}"
+                              Style="{StaticResource ModernDatePicker}"
+                              Margin="0,0,10,0"/>
+                    <TextBlock Text="to" 
+                             VerticalAlignment="Center" 
+                             Foreground="{DynamicResource ForegroundBrush}"
+                             Margin="0,0,10,0"/>
+                    <DatePicker x:Name="EndDatePicker"
+                              SelectedDate="{Binding EndDate, Mode=TwoWay}"
+                              Style="{StaticResource ModernDatePicker}"/>
+                </StackPanel>
 
-            <!-- Entity Type Filter -->
-            <ComboBox Grid.Column="1" 
-                     x:Name="EntityTypeFilter"
-                     Width="150"
-                     Margin="10,0">
-                <ComboBoxItem Content="All Types" IsSelected="True"/>
-                <ComboBoxItem Content="Employee"/>
-                <ComboBoxItem Content="Role"/>
-                <ComboBoxItem Content="Settings"/>
-            </ComboBox>
+                <!-- Entity Type Filter -->
+                <ComboBox Grid.Column="1" 
+                         x:Name="EntityTypeFilter"
+                         Width="150"
+                         Style="{StaticResource ModernComboBox}"
+                         Margin="10,0">
+                    <ComboBoxItem Content="All Types" IsSelected="True"/>
+                    <ComboBoxItem Content="Employee"/>
+                    <ComboBoxItem Content="Role"/>
+                    <ComboBoxItem Content="Settings"/>
+                </ComboBox>
 
-            <!-- Action Type Filter -->
-            <ComboBox Grid.Column="2"
-                     x:Name="ActionTypeFilter"
-                     Width="150">
-                <ComboBoxItem Content="All Actions" IsSelected="True"/>
-                <ComboBoxItem Content="Create"/>
-                <ComboBoxItem Content="Update"/>
-                <ComboBoxItem Content="Delete"/>
-                <ComboBoxItem Content="Login"/>
-                <ComboBoxItem Content="Logout"/>
-            </ComboBox>
-        </Grid>
+                <!-- Action Type Filter -->
+                <ComboBox Grid.Column="2"
+                         x:Name="ActionTypeFilter"
+                         Width="150"
+                         Style="{StaticResource ModernComboBox}">
+                    <ComboBoxItem Content="All Actions" IsSelected="True"/>
+                    <ComboBoxItem Content="Create"/>
+                    <ComboBoxItem Content="Update"/>
+                    <ComboBoxItem Content="Delete"/>
+                    <ComboBoxItem Content="Login"/>
+                    <ComboBoxItem Content="Logout"/>
+                </ComboBox>
+            </Grid>
+        </Border>
 
         <!-- Logs List -->
         <DataGrid Grid.Row="3" 
@@ -99,6 +111,7 @@
                  ItemsSource="{Binding Logs}"
                  AutoGenerateColumns="False"
                  IsReadOnly="True"
+                 Style="{StaticResource ModernDataGrid}"
                  Margin="10">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Timestamp" 

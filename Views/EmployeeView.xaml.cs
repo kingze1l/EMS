@@ -31,5 +31,13 @@ namespace EMS.Views
                 _viewModel.Password = passwordBox.SecurePassword;
             }
         }
+
+        private void EmployeeDataGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is DataGrid grid)
+            {
+                grid.UpdateLayout();
+            }
+        }
     }
 } 
