@@ -194,6 +194,16 @@
                         </StackPanel>
                     </Button>
                     
+                    <!-- My Profile Button -->
+                    <Button x:Name="ProfileButton"
+                          Style="{StaticResource NavigationButton}"
+                          Click="Profile_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👤" Margin="0,0,12,0" FontSize="16"/>
+                            <TextBlock Text="My Profile"/>
+                        </StackPanel>
+                    </Button>
+                    
                     <Button x:Name="AttendanceButton" 
                           Style="{StaticResource NavigationButton}" 
                           Click="Attendance_Click">

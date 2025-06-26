@@ -797,6 +797,9 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <converters:InitialsConverter x:Key="InitialsConverter" />
+            <DropShadowEffect x:Key="CardShadow" BlurRadius="18" ShadowDepth="0" Opacity="0.18" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

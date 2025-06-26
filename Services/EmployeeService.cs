@@ -64,21 +64,77 @@ namespace EMS.Services
             }
         }
 
-        public async Task<bool> UpdateEmployeeAsync(Employee employee, UserRole currentUserRole)
+        public async Task<bool> UpdateEmployeeAsync(Employee updatedEmployee, UserRole currentUserRole, string? oldPassword = null)
         {
-            if (currentUserRole.RoleName != "Admin")
+            // Admin can update any employee without old password
+            if (currentUserRole.RoleName == "Admin")
+            {
+                try
+                {
+                    var result = await _employees.ReplaceOneAsync(e => e.Id == updatedEmployee.Id, updatedEmployee);
+                    return result.ModifiedCount > 0;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            // Manager cannot update any employee info
+            if (currentUserRole.RoleName == "Manager")
                 return false;
 
-            try
+            // Employee can only update their own info (contact/password)
+            if (currentUserRole.RoleName == "Employee")
             {
-                // Password is already hashed in the ViewModel if it was changed
-                var result = await _employees.ReplaceOneAsync(e => e.Id == employee.Id, employee);
-                return result.ModifiedCount > 0;
+                try
+                {
+                    var existingEmployee = await _employees.Find(e => e.Id == updatedEmployee.Id).FirstOrDefaultAsync();
+                    if (existingEmployee == null || existingEmployee.Username != updatedEmployee.Username)
+                        return false; // Cannot change username or update others
+
+                    // Check if password is being changed
+                    bool isPasswordChange = !string.IsNullOrEmpty(updatedEmployee.Password) && updatedEmployee.Password != existingEmployee.Password;
+                    
+                    if (isPasswordChange)
+                    {
+                        // Require old password to match
+                        if (string.IsNullOrEmpty(oldPassword) || !BCrypt.Net.BCrypt.Verify(oldPassword, existingEmployee.Password))
+                            return false;
+                    }
+                    else
+                    {
+                        // Keep existing password if not changing
+                        updatedEmployee.Password = existingEmployee.Password;
+                    }
+
+                    // Only allow updating contact info and password
+                    existingEmployee.Contact = updatedEmployee.Contact;
+                    existingEmployee.Password = updatedEmployee.Password;
+                    
+                    // Preserve all other fields from existing employee
+                    updatedEmployee.Name = existingEmployee.Name;
+                    updatedEmployee.Position = existingEmployee.Position;
+                    updatedEmployee.Username = existingEmployee.Username;
+                    updatedEmployee.UserRole = existingEmployee.UserRole;
+                    updatedEmployee.DateOfBirth = existingEmployee.DateOfBirth;
+                    updatedEmployee.BasePay = existingEmployee.BasePay;
+                    updatedEmployee.Bonus = existingEmployee.Bonus;
+                    updatedEmployee.Deductions = existingEmployee.Deductions;
+                    updatedEmployee.BiometricEnabled = existingEmployee.BiometricEnabled;
+                    updatedEmployee.BiometricUserId = existingEmployee.BiometricUserId;
+                    updatedEmployee.BiometricEnrolledDate = existingEmployee.BiometricEnrolledDate;
+
+                    var result = await _employees.ReplaceOneAsync(e => e.Id == updatedEmployee.Id, updatedEmployee);
+                    return result.ModifiedCount > 0;
+                }
+                catch
+                {
+                    return false;
+                }
             }
-            catch
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public async Task<bool> DeleteEmployeeAsync(string id, UserRole currentUserRole)

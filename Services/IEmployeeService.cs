@@ -10,7 +10,7 @@ namespace EMS.Services
         Task<Employee?> GetEmployeeByIdAsync(string id, UserRole currentUserRole);
         Task<IEnumerable<Employee>> GetAllEmployeesAsync(UserRole currentUserRole);
         Task<bool> AddEmployeeAsync(Employee employee);
-        Task<bool> UpdateEmployeeAsync(Employee employee, UserRole currentUserRole);
+        Task<bool> UpdateEmployeeAsync(Employee employee, UserRole currentUserRole, string? oldPassword = null);
         Task<bool> DeleteEmployeeAsync(string id, UserRole currentUserRole);
     }
 }

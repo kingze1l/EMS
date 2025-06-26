@@ -149,8 +149,38 @@ namespace EMS
                         Visibility.Visible : Visibility.Collapsed;
                 }
                 
-                // You can add similar logic for other UI elements based on permissions
-                // For example, a menu item for Payroll might be hidden if the user doesn't have payroll permissions.
+                // Hide sidebar buttons for employees who lack permissions
+                if (!_authService.HasPermission(EMS.Models.Permission.ViewPayroll))
+                {
+                    var payrollButton = FindName("PayrollButton") as Button;
+                    if (payrollButton != null) payrollButton.Visibility = Visibility.Collapsed;
+                }
+                if (!_authService.HasPermission(EMS.Models.Permission.ViewReports))
+                {
+                    var analyticsButton = FindName("AnalyticsButton") as Button;
+                    if (analyticsButton != null) analyticsButton.Visibility = Visibility.Collapsed;
+                    var reportButton = FindName("ReportButton") as Button;
+                    if (reportButton != null) reportButton.Visibility = Visibility.Collapsed;
+                }
+                if (!_authService.HasPermission(EMS.Models.Permission.ManageUsers))
+                {
+                    var settingsButton = FindName("SettingsButton") as Button;
+                    if (settingsButton != null) settingsButton.Visibility = Visibility.Collapsed;
+                }
+                if (!_authService.HasPermission(EMS.Models.Permission.EditRoles))
+                {
+                    var auditLogsButton = FindName("AuditLogsButton") as Button;
+                    if (auditLogsButton != null) auditLogsButton.Visibility = Visibility.Collapsed;
+                    // Hide Role Management button in AdminPanel
+                    if (FindName("AdminPanel") is StackPanel roleAdminPanel)
+                    {
+                        foreach (var child in roleAdminPanel.Children)
+                        {
+                            if (child is Button btn && btn.Content?.ToString()?.Contains("Role Management") == true)
+                                btn.Visibility = Visibility.Collapsed;
+                        }
+                    }
+                }
             }
             else
             {
@@ -651,6 +681,24 @@ namespace EMS
             {
                 MessageBox.Show("You do not have permission to view Payroll.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void Profile_Click(object sender, RoutedEventArgs e)
+        {
+            var profileButton = FindName("ProfileButton") as Button;
+            SetActiveButton(profileButton);
+            AnimatePageTransition(async () =>
+            {
+                if (_mainFrame != null && _authService?.CurrentUser != null && _employeeService != null)
+                {
+                    var viewModel = new EMS.ViewModels.ProfileViewModel(_employeeService, _authService.CurrentUser);
+                    var view = new EMS.Views.ProfileView
+                    {
+                        DataContext = viewModel
+                    };
+                    _mainFrame.Content = view;
+                }
+            });
         }
     }
 }
