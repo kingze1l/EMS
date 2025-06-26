@@ -82,7 +82,8 @@
                 <ComboBox Grid.Column="1" 
                          x:Name="EntityTypeFilter"
                          Width="150"
-                         Style="{StaticResource ModernComboBox}"
+                         Style="{StaticResource DarkComboBox}"
+                         ItemContainerStyle="{StaticResource DarkComboBoxItem}"
                          Margin="10,0">
                     <ComboBoxItem Content="All Types" IsSelected="True"/>
                     <ComboBoxItem Content="Employee"/>
@@ -94,7 +95,8 @@
                 <ComboBox Grid.Column="2"
                          x:Name="ActionTypeFilter"
                          Width="150"
-                         Style="{StaticResource ModernComboBox}">
+                         Style="{StaticResource DarkComboBox}"
+                         ItemContainerStyle="{StaticResource DarkComboBoxItem}">
                     <ComboBoxItem Content="All Actions" IsSelected="True"/>
                     <ComboBoxItem Content="Create"/>
                     <ComboBoxItem Content="Update"/>

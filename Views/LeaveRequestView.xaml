@@ -107,7 +107,8 @@
                           Height="340"
                           VerticalScrollBarVisibility="Auto"
                           RowHeight="48"
-                          ClipToBounds="False">
+                          ClipToBounds="False"
+                          MouseDoubleClick="LeaveRequestsDataGrid_MouseDoubleClick">
                     <DataGrid.Resources>
                         <Style TargetType="DataGridCell">
                             <Setter Property="ClipToBounds" Value="False"/>

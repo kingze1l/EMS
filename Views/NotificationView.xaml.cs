@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Windows.Threading;
+using EMS.Views;
 
 namespace EMS.Views
 {
@@ -62,7 +63,7 @@ namespace EMS.Views
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Error loading notifications: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup($"Error loading notifications: {ex.Message}", NotificationType.Error, Application.Current.MainWindow);
             }
         }
 
@@ -73,7 +74,7 @@ namespace EMS.Views
                 if (!string.IsNullOrEmpty(notification.ActionUrl))
                 {
                     // TODO: Navigate to the action URL
-                    MessageBox.Show($"Would navigate to: {notification.ActionUrl}");
+                    NotificationPopup.ShowPopup($"Would navigate to: {notification.ActionUrl}", NotificationType.Info, Application.Current.MainWindow);
                 }
 
                 if (!notification.IsRead)
@@ -86,7 +87,7 @@ namespace EMS.Views
                     }
                     catch (System.Exception ex)
                     {
-                        MessageBox.Show($"Error marking notification as read: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        NotificationPopup.ShowPopup($"Error marking notification as read: {ex.Message}", NotificationType.Error, Application.Current.MainWindow);
                     }
                 }
             }

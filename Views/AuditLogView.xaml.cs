@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
+using EMS.Views;
 
 namespace EMS.Views
 {
@@ -133,7 +134,7 @@ namespace EMS.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading audit logs: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup($"Error loading audit logs: {ex.Message}", NotificationType.Error, Application.Current.MainWindow);
             }
             finally
             {

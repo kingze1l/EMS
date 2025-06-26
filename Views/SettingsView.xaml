@@ -82,7 +82,8 @@
                                      Style="{StaticResource SettingLabelStyle}"/>
                             <ComboBox ItemsSource="{Binding AvailableThemes}"
                                     SelectedItem="{Binding SelectedTheme}"
-                                    Style="{StaticResource SettingComboBoxStyle}"/>
+                                    Style="{StaticResource DarkComboBox}"
+                                    ItemContainerStyle="{StaticResource DarkComboBoxItem}"/>
                         </StackPanel>
 
                         <!-- Language Selection -->
@@ -91,7 +92,8 @@
                                      Style="{StaticResource SettingLabelStyle}"/>
                             <ComboBox ItemsSource="{Binding AvailableLanguages}"
                                     SelectedItem="{Binding SelectedLanguage}"
-                                    Style="{StaticResource SettingComboBoxStyle}"/>
+                                    Style="{StaticResource DarkComboBox}"
+                                    ItemContainerStyle="{StaticResource DarkComboBoxItem}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>

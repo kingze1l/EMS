@@ -86,7 +86,8 @@
                            SelectedItem="{Binding SelectedEmployee, Mode=TwoWay}"
                            DisplayMemberPath="Name" 
                            Width="200" 
-                           Style="{StaticResource ModernComboBox}"
+                           Style="{StaticResource DarkComboBox}"
+                           ItemContainerStyle="{StaticResource DarkComboBoxItem}"
                            Margin="0,0,0,10"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                         <TextBlock Text="Base Pay:" 

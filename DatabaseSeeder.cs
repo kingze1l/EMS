@@ -11,11 +11,13 @@ namespace EMS
     {
         private readonly IMongoCollection<Employee> _employeeCollection;
         private readonly IMongoCollection<Role> _roleCollection;
+        private readonly IMongoCollection<PermissionDefinition> _permissionCollection;
 
         public DatabaseSeeder(IMongoDatabase database)
         {
             _employeeCollection = database.GetCollection<Employee>("Employees");
             _roleCollection = database.GetCollection<Role>("roles");
+            _permissionCollection = database.GetCollection<PermissionDefinition>("permissions");
         }
 
         public async Task SeedDataAsync()
@@ -23,11 +25,18 @@ namespace EMS
             // Check if data already exists
             if (await _employeeCollection.CountDocumentsAsync(FilterDefinition<Employee>.Empty) > 0)
             {
+                // Update existing admin roles with payroll permissions
+                await UpdateExistingAdminRolesAsync();
+                // Ensure permission definitions exist
+                await SeedPermissionDefinitionsAsync();
                 return;
             }
 
             // Clear existing roles to ensure a fresh seed
             await _roleCollection.DeleteManyAsync(FilterDefinition<Role>.Empty);
+
+            // Seed permission definitions first
+            await SeedPermissionDefinitionsAsync();
 
             // Create roles
             var adminRole = new Role 
@@ -42,7 +51,11 @@ namespace EMS
                     Permission.EditEmployees.ToString(),
                     Permission.ViewReports.ToString(),
                     Permission.EditRoles.ToString(),
-                    Permission.ManageUsers.ToString()
+                    Permission.ManageUsers.ToString(),
+                    Permission.ViewPayroll.ToString(),
+                    Permission.EditPayroll.ToString(),
+                    Permission.GeneratePayroll.ToString(),
+                    Permission.ViewPayrollHistory.ToString()
                 } 
             };
 
@@ -182,6 +195,100 @@ namespace EMS
                 }
             }
             return permissions;
+        }
+
+        private async Task UpdateExistingAdminRolesAsync()
+        {
+            try
+            {
+                // Find the Admin role
+                var adminRole = await _roleCollection.Find(r => r.RoleName == "Admin").FirstOrDefaultAsync();
+                
+                if (adminRole != null)
+                {
+                    // Check if payroll permissions are missing
+                    var payrollPermissions = new List<string>
+                    {
+                        Permission.ViewPayroll.ToString(),
+                        Permission.EditPayroll.ToString(),
+                        Permission.GeneratePayroll.ToString(),
+                        Permission.ViewPayrollHistory.ToString()
+                    };
+
+                    bool needsUpdate = false;
+                    foreach (var permission in payrollPermissions)
+                    {
+                        if (!adminRole.Permissions.Contains(permission))
+                        {
+                            adminRole.Permissions.Add(permission);
+                            needsUpdate = true;
+                        }
+                    }
+
+                    // Update the role if needed
+                    if (needsUpdate)
+                    {
+                        await _roleCollection.ReplaceOneAsync(r => r.Id == adminRole.Id, adminRole);
+                        
+                        // Update all employees with Admin role to have the new permissions
+                        var adminEmployees = await _employeeCollection.Find(e => e.UserRole.RoleName == "Admin").ToListAsync();
+                        
+                        foreach (var employee in adminEmployees)
+                        {
+                            // Update employee's permissions to match the updated role
+                            employee.UserRole.Permissions = ConvertPermissionStringsToEnums(adminRole.Permissions);
+                            await _employeeCollection.ReplaceOneAsync(e => e.Id == employee.Id, employee);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't throw to prevent application startup issues
+                System.Diagnostics.Debug.WriteLine($"Error updating admin roles: {ex.Message}");
+            }
+        }
+
+        private async Task SeedPermissionDefinitionsAsync()
+        {
+            try
+            {
+                // Check if permissions already exist
+                var existingPermissions = await _permissionCollection.Find(_ => true).ToListAsync();
+                if (existingPermissions.Any())
+                {
+                    return; // Permissions already exist
+                }
+
+                var permissionDefinitions = new List<PermissionDefinition>
+                {
+                    // Employee permissions
+                    new PermissionDefinition { Name = "ViewEmployees", Description = "View employee information", Category = PermissionDefinition.Categories.Employee },
+                    new PermissionDefinition { Name = "EditEmployees", Description = "Edit employee information", Category = PermissionDefinition.Categories.Employee },
+                    
+                    // Payroll permissions
+                    new PermissionDefinition { Name = "ViewPayroll", Description = "View payroll information", Category = PermissionDefinition.Categories.Payroll },
+                    new PermissionDefinition { Name = "EditPayroll", Description = "Edit payroll information", Category = PermissionDefinition.Categories.Payroll },
+                    new PermissionDefinition { Name = "GeneratePayroll", Description = "Generate payroll records", Category = PermissionDefinition.Categories.Payroll },
+                    new PermissionDefinition { Name = "ViewPayrollHistory", Description = "View payroll history", Category = PermissionDefinition.Categories.Payroll },
+                    
+                    // Role permissions
+                    new PermissionDefinition { Name = "EditRoles", Description = "Manage roles and permissions", Category = PermissionDefinition.Categories.Role },
+                    
+                    // User management permissions
+                    new PermissionDefinition { Name = "ManageUsers", Description = "Manage user accounts", Category = PermissionDefinition.Categories.Employee },
+                    
+                    // Report permissions
+                    new PermissionDefinition { Name = "ViewReports", Description = "View system reports", Category = PermissionDefinition.Categories.Dashboard }
+                };
+
+                await _permissionCollection.InsertManyAsync(permissionDefinitions);
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't throw to prevent application startup issues
+                System.Diagnostics.Debug.WriteLine($"Error seeding permission definitions: {ex.Message}");
+            }
         }
     }
 } 

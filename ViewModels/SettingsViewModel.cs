@@ -8,6 +8,7 @@ using System.Windows.Input;
 using EMS.Models;
 using EMS.Services;
 using System.Windows;
+using EMS.Views;
 
 namespace EMS.ViewModels
 {
@@ -161,7 +162,7 @@ namespace EMS.ViewModels
                     {
                         await _settingsService.UpdateAdminSettingsAsync(_adminSettings);
                     }
-                    MessageBox.Show("Settings saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    NotificationPopup.ShowPopup("Settings saved successfully!", NotificationType.Success, Application.Current.MainWindow);
                 }
                 else
                 {

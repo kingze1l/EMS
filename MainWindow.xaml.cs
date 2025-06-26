@@ -12,6 +12,8 @@ using EMS.ViewModels;  // Add this line
 using System.Windows.Threading;
 using System.Threading.Tasks;
 using EMS.Utils;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace EMS
 {
@@ -327,7 +329,10 @@ namespace EMS
             SetActiveButton(auditLogsButton);
             AnimatePageTransition(async () =>
             {
-                MainFrame.Navigate(new AuditLogView(_auditLogService));
+                if (_mainFrame != null)
+                {
+                    _mainFrame.NavigationService?.Navigate(new AuditLogView(_auditLogService));
+                }
             });
         }
 
@@ -366,8 +371,10 @@ namespace EMS
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Are you sure you want to logout?", "Logout", 
-                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            var dialog = new EMS.Views.DarkDialog("Are you sure you want to logout?");
+            dialog.Owner = this;
+            bool? result = dialog.ShowDialog();
+            if (result == true)
             {
                 // Log the logout action
                 if (_authService?.CurrentUser != null)
@@ -413,12 +420,70 @@ namespace EMS
             }
         }
 
-        private void Search_TextChanged(object sender, TextChangedEventArgs e)
+        private async void Search_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (sender is TextBox searchBox && !string.IsNullOrWhiteSpace(searchBox.Text))
+            if (sender is TextBox searchBox)
             {
-                // TODO: Implement search functionality
-                // Accessing current user for context is already possible via _authService?.CurrentUser
+                var query = searchBox.Text.Trim();
+                var results = new List<string>();
+
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    ((ListBox)FindName("SearchResultsListBox")).Visibility = Visibility.Collapsed;
+                    ((ListBox)FindName("SearchResultsListBox")).ItemsSource = null;
+                    return;
+                }
+
+                // Global navigation options
+                var navOptions = new List<string> { "Dashboard", "Attendance", "Employees", "Payroll", "Analytics", "Report", "Settings", "Audit Logs", "Leave Requests" };
+                results.AddRange(navOptions.Where(opt => opt.Contains(query, StringComparison.OrdinalIgnoreCase)));
+
+                // Employee search (by name)
+                if (_employeeService != null)
+                {
+                    var employees = await _employeeService.GetAllEmployeesAsync(_authService?.CurrentUser?.UserRole ?? new EMS.Models.UserRole { RoleName = "Employee" });
+                    results.AddRange(employees.Where(emp => emp.Name.Contains(query, StringComparison.OrdinalIgnoreCase)).Select(emp => $"Employee: {emp.Name}"));
+                }
+
+                // Add more global search sources as needed (e.g., settings, payroll, etc.)
+
+                if (results.Count > 0)
+                {
+                    ((ListBox)FindName("SearchResultsListBox")).ItemsSource = results;
+                    ((ListBox)FindName("SearchResultsListBox")).Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    ((ListBox)FindName("SearchResultsListBox")).Visibility = Visibility.Collapsed;
+                    ((ListBox)FindName("SearchResultsListBox")).ItemsSource = null;
+                }
+            }
+        }
+
+        private void SearchResultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (((ListBox)FindName("SearchResultsListBox")).SelectedItem is string selected)
+            {
+                // Navigation logic
+                if (selected == "Dashboard") Dashboard_Click(null, null);
+                else if (selected == "Attendance") Attendance_Click(null, null);
+                else if (selected == "Employees") Employees_Click(null, null);
+                else if (selected == "Payroll") Payroll_Click(null, null);
+                else if (selected == "Analytics") Analytics_Click(null, null);
+                else if (selected == "Report") Report_Click(null, null);
+                else if (selected == "Settings") Settings_Click(null, null);
+                else if (selected == "Audit Logs") AuditLogs_Click(null, null);
+                else if (selected == "Leave Requests") LeaveRequests_Click(null, null);
+                else if (selected.StartsWith("Employee: "))
+                {
+                    // Optionally, navigate to Employees page and select the employee
+                    Employees_Click(null, null);
+                    // Optionally, pass the employee name to the EmployeeViewModel for selection
+                }
+                // Hide dropdown after selection
+                ((ListBox)FindName("SearchResultsListBox")).Visibility = Visibility.Collapsed;
+                ((ListBox)FindName("SearchResultsListBox")).SelectedItem = null;
+                ((TextBox)FindName("SearchBox")).Text = string.Empty;
             }
         }
 

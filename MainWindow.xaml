@@ -294,9 +294,30 @@
                     <Border Background="Transparent" 
                           Width="350" 
                           HorizontalAlignment="Left">
-                        <TextBox x:Name="SearchBox"
-                                Style="{StaticResource SearchBoxStyle}"
-                                TextChanged="Search_TextChanged"/>
+                        <Grid>
+                            <TextBox x:Name="SearchBox"
+                                    Style="{StaticResource SearchBoxStyle}"
+                                    TextChanged="Search_TextChanged"
+                                    VerticalAlignment="Center"
+                                    Margin="0"/>
+                            <!-- Simulated glassy dropdown -->
+                            <Border x:Name="AcrylicDropdownBorder"
+                                    Background="#CC222B45"
+                                    CornerRadius="20"
+                                    Margin="0,40,0,0"
+                                    BorderBrush="White"
+                                    BorderThickness="1"
+                                    Visibility="{Binding Visibility, ElementName=SearchResultsListBox}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="18" ShadowDepth="0" Opacity="0.18"/>
+                                </Border.Effect>
+                                <ListBox x:Name="SearchResultsListBox"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         MaxHeight="200"
+                                         SelectionChanged="SearchResultsListBox_SelectionChanged"/>
+                            </Border>
+                        </Grid>
                     </Border>
 
                     <!-- User Info and Actions -->

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using EMS.Views;
 
 namespace EMS.ViewModels
 {
@@ -242,8 +243,7 @@ namespace EMS.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Error loading payroll records: {ex.Message}";
-                MessageBox.Show($"Error loading payroll records: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
             }
             finally
             {
@@ -274,8 +274,7 @@ namespace EMS.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Error loading employees: {ex.Message}";
-                MessageBox.Show($"Error loading employees: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
             }
             finally
             {
@@ -287,8 +286,7 @@ namespace EMS.ViewModels
         {
             if (SelectedEmployee == null)
             {
-                MessageBox.Show("Please select an employee to update.", "No Employee Selected", 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                NotificationPopup.ShowPopup("Please select an employee to update.", NotificationType.Info);
                 return;
             }
 
@@ -319,21 +317,18 @@ namespace EMS.ViewModels
                     });
 
                     StatusMessage = $"Successfully updated pay details for {SelectedEmployee.Name}.";
-                    MessageBox.Show($"Successfully updated pay details for {SelectedEmployee.Name}.", 
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    NotificationPopup.ShowPopup(StatusMessage, NotificationType.Success);
                 }
                 else
                 {
                     StatusMessage = "Failed to update employee pay details.";
-                    MessageBox.Show("Failed to update employee pay details.", "Error", 
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
                 }
             }
             catch (Exception ex)
             {
                 StatusMessage = $"Error updating employee pay: {ex.Message}";
-                MessageBox.Show($"Error updating employee pay: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
             }
             finally
             {
@@ -345,8 +340,7 @@ namespace EMS.ViewModels
         {
             if (SelectedEmployee == null)
             {
-                MessageBox.Show("Please select an employee to generate payroll for.", "No Employee Selected", 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                NotificationPopup.ShowPopup("Please select an employee to generate payroll for.", NotificationType.Info);
                 return;
             }
 
@@ -373,8 +367,7 @@ namespace EMS.ViewModels
                 if (success)
                 {
                     StatusMessage = $"Successfully generated payroll for {SelectedEmployee.Name}.";
-                    MessageBox.Show($"Successfully generated payroll for {SelectedEmployee.Name}.", 
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    NotificationPopup.ShowPopup(StatusMessage, NotificationType.Success);
                     
                     // Refresh the payroll records
                     await LoadPayrollRecordsAsync();
@@ -382,15 +375,13 @@ namespace EMS.ViewModels
                 else
                 {
                     StatusMessage = "Failed to generate payroll record.";
-                    MessageBox.Show("Failed to generate payroll record.", "Error", 
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
                 }
             }
             catch (Exception ex)
             {
                 StatusMessage = $"Error generating payroll: {ex.Message}";
-                MessageBox.Show($"Error generating payroll: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
             }
             finally
             {
@@ -402,8 +393,7 @@ namespace EMS.ViewModels
         {
             if (!Employees.Any())
             {
-                MessageBox.Show("No employees available for bulk payroll generation.", "No Employees", 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                NotificationPopup.ShowPopup("No employees available for bulk payroll generation.", NotificationType.Info);
                 return;
             }
 
@@ -441,8 +431,7 @@ namespace EMS.ViewModels
                 if (success)
                 {
                     StatusMessage = $"Successfully generated payroll for {employeeIds.Count} employees.";
-                    MessageBox.Show($"Successfully generated payroll for {employeeIds.Count} employees.", 
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    NotificationPopup.ShowPopup(StatusMessage, NotificationType.Success);
                     
                     // Refresh the payroll records
                     await LoadPayrollRecordsAsync();
@@ -450,15 +439,13 @@ namespace EMS.ViewModels
                 else
                 {
                     StatusMessage = "Failed to generate bulk payroll.";
-                    MessageBox.Show("Failed to generate bulk payroll.", "Error", 
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
                 }
             }
             catch (Exception ex)
             {
                 StatusMessage = $"Error generating bulk payroll: {ex.Message}";
-                MessageBox.Show($"Error generating bulk payroll: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
             }
             finally
             {
@@ -495,8 +482,7 @@ namespace EMS.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Error searching payroll records: {ex.Message}";
-                MessageBox.Show($"Error searching payroll records: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
             }
             finally
             {
@@ -519,8 +505,7 @@ namespace EMS.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Error calculating total payroll: {ex.Message}";
-                MessageBox.Show($"Error calculating total payroll: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                NotificationPopup.ShowPopup(StatusMessage, NotificationType.Error);
             }
             finally
             {

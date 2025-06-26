@@ -11,6 +11,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Security;
 using EMS.Utils;
+using EMS.Views;
 
 namespace EMS.ViewModels
 {
@@ -335,7 +336,7 @@ namespace EMS.ViewModels
                             Details = $"Created new employee: {SelectedEmployee.Name} with role {SelectedEmployee.UserRole.RoleName}",
                             IpAddress = NetworkUtils.GetLocalIpAddress()
                         });
-                        MessageBox.Show("Employee added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        NotificationPopup.ShowPopup("Employee added successfully!", NotificationType.Success, Application.Current.MainWindow);
                     }
                 }
                 else
@@ -373,7 +374,7 @@ namespace EMS.ViewModels
                             Details = $"Updated employee: {SelectedEmployee.Name} with role {SelectedEmployee.UserRole.RoleName}",
                             IpAddress = NetworkUtils.GetLocalIpAddress()
                         });
-                        MessageBox.Show("Employee updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        NotificationPopup.ShowPopup("Employee updated successfully!", NotificationType.Success, Application.Current.MainWindow);
                     }
                 }
 
@@ -439,7 +440,7 @@ namespace EMS.ViewModels
                         Employees.Remove(SelectedEmployee);
                         SelectedEmployee = null;
                     });
-                    MessageBox.Show("Employee deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    NotificationPopup.ShowPopup("Employee deleted successfully!", NotificationType.Success, Application.Current.MainWindow);
                 }
                 else
                 {
@@ -488,8 +489,7 @@ namespace EMS.ViewModels
                         IpAddress = NetworkUtils.GetLocalIpAddress()
                     });
 
-                    MessageBox.Show($"Password for {SelectedEmployee.Username} reset successfully!\nNew password: {newPassword}", 
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    NotificationPopup.ShowPopup($"Password for {SelectedEmployee.Username} reset successfully!\nNew password: {newPassword}", NotificationType.Success, Application.Current.MainWindow);
                     await LoadEmployees();
                 }
                 else
