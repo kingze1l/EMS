@@ -7,7 +7,7 @@ namespace EMS.Views
 {
     public partial class DashboardView : UserControl
     {
-        private DashboardViewModel _viewModel;
+        private DashboardViewModel? _viewModel;
 
         public DashboardView()
         {

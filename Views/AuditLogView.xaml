@@ -67,7 +67,7 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <DatePicker x:Name="StartDatePicker" 
                               SelectedDate="{Binding StartDate, Mode=TwoWay}"
-                              Style="{StaticResource ModernDatePicker}"
+                              Style="{StaticResource SimpleModernDatePicker}"
                               Margin="0,0,10,0"/>
                     <TextBlock Text="to" 
                              VerticalAlignment="Center" 
@@ -75,7 +75,7 @@
                              Margin="0,0,10,0"/>
                     <DatePicker x:Name="EndDatePicker"
                               SelectedDate="{Binding EndDate, Mode=TwoWay}"
-                              Style="{StaticResource ModernDatePicker}"/>
+                              Style="{StaticResource SimpleModernDatePicker}"/>
                 </StackPanel>
 
                 <!-- Entity Type Filter -->

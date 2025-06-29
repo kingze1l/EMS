@@ -66,7 +66,7 @@ namespace EMS
             // Set Dashboard as default active page
             var dashboardButton = FindName("DashboardButton") as Button;
             SetActiveButton(dashboardButton);
-            Dashboard_Click(null, null);
+            Dashboard_Click(this, new RoutedEventArgs());
         }
 
         private void SetActiveButton(Button? activeButton)

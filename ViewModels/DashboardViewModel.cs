@@ -54,13 +54,17 @@ namespace EMS.ViewModels
             _payrollService = payrollService;
             _authService = authService;
 
+            // Initialize chart collections
+            _roleDistributionChart = new SeriesCollection();
+            _leaveStatusChart = new SeriesCollection();
+            _payrollTrendChart = new SeriesCollection();
+
             RefreshCommand = new RelayCommand(async () => await LoadDashboardDataAsync());
             DateRangeChangedCommand = new RelayCommand(async () => await LoadDashboardDataAsync());
 
             _recentPayrollRecords = new ObservableCollection<PayrollRecord>();
             _recentLeaveRequests = new ObservableCollection<LeaveRequest>();
 
-            InitializeCharts();
             _ = LoadDashboardDataAsync();
         }
 

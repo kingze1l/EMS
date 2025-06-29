@@ -56,17 +56,17 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Start Date:" Style="{StaticResource SettingLabelStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <DatePicker Grid.Row="0" Grid.Column="1"
-                                SelectedDate="{Binding NewLeaveRequest.StartDate, Mode=TwoWay}"
-                                Style="{StaticResource ModernDatePicker}"
-                                Margin="0,0,20,0"/>
+                    <DatePicker x:Name="StartDatePicker" 
+                              SelectedDate="{Binding StartDate, Mode=TwoWay}"
+                              Style="{StaticResource SimpleModernDatePicker}"
+                              Margin="0,0,10,0"/>
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="End Date:" Style="{StaticResource SettingLabelStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <DatePicker Grid.Row="0" Grid.Column="3"
-                                SelectedDate="{Binding NewLeaveRequest.EndDate, Mode=TwoWay}"
-                                Style="{StaticResource ModernDatePicker}"/>
+                    <DatePicker x:Name="EndDatePicker"
+                              SelectedDate="{Binding EndDate, Mode=TwoWay}"
+                              Style="{StaticResource SimpleModernDatePicker}"/>
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Reason:" Style="{StaticResource SettingLabelStyle}" VerticalAlignment="Top" Margin="0,10,10,0"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
-                             Text="{Binding NewLeaveRequest.Reason, Mode=TwoWay}"
+                             Text="{Binding Reason, Mode=TwoWay}"
                              Style="{StaticResource ModernTextBox}"
                              Height="60"
                              TextWrapping="Wrap"

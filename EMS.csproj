@@ -21,7 +21,7 @@
     <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
-    <PackageReference Include="MaterialDesignColors" Version="2.1.4" />
+    <PackageReference Include="MaterialDesignColors" Version="4.9.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,7 +10,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!-- ComboBox ToggleButton Template for Dark Theme -->
             <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
@@ -587,38 +586,52 @@
                 </Setter>
             </Style>
 
-            <!-- Modern DatePicker Style -->
-            <Style x:Key="ModernDatePicker" TargetType="DatePicker">
+            <!-- Simple Modern DatePicker Style (More Reliable) -->
+            <Style x:Key="SimpleModernDatePicker" TargetType="DatePicker">
                 <Setter Property="Background" Value="#15FFFFFF"/>
                 <Setter Property="Foreground" Value="White"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Padding" Value="15,12"/>
+                <Setter Property="BorderBrush" Value="#3A3D4D"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="10,8"/>
                 <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="35"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="DatePicker">
                             <Border Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="12"
+                                    CornerRadius="8"
                                     x:Name="border">
                                 <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
                                     <DatePickerTextBox x:Name="PART_TextBox"
+                                                     Grid.Column="0"
                                                      Background="Transparent"
                                                      Foreground="White"
                                                      BorderThickness="0"
-                                                     Padding="15,12,35,12"
+                                                     Padding="10,8"
                                                      VerticalAlignment="Center"
-                                                     HorizontalAlignment="Left"/>
+                                                     HorizontalAlignment="Stretch"
+                                                     FontSize="14"/>
+                                    
                                     <Button x:Name="PART_Button"
                                           Grid.Column="1"
                                           Width="30"
                                           Height="30"
-                                          Margin="0,0,5,0"
+                                          Margin="5,0,5,0"
                                           HorizontalAlignment="Right"
                                           VerticalAlignment="Center"
                                           Background="Transparent"
-                                          BorderThickness="0">
+                                          BorderThickness="0"
+                                          Cursor="Hand">
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
                                                 <Border Background="Transparent"
@@ -637,11 +650,11 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsFocused" Value="True">
                                     <Setter TargetName="border" Property="Background" Value="#25FFFFFF"/>
-                                    <Setter TargetName="border" Property="Effect">
-                                        <Setter.Value>
-                                            <DropShadowEffect Color="#4A90E2" BlurRadius="10" ShadowDepth="0"/>
-                                        </Setter.Value>
-                                    </Setter>
+                                    <Setter TargetName="border" Property="BorderBrush" Value="#4A90E2"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#20FFFFFF"/>
+                                    <Setter TargetName="border" Property="BorderBrush" Value="#4A90E2"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

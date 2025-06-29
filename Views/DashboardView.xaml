@@ -67,20 +67,17 @@
                              FontWeight="SemiBold"
                              Foreground="{DynamicResource ForegroundBrush}"/>
                     
-                    <DatePicker Grid.Column="1" 
-                              SelectedDate="{Binding StartDate}"
-                              Style="{StaticResource ModernDatePicker}"
-                              Margin="0,0,15,0"/>
+                    <DatePicker SelectedDate="{Binding StartDate, Mode=TwoWay}"
+                             Style="{StaticResource SimpleModernDatePicker}"
+                             Margin="0,0,10,0"/>
                     
-                    <TextBlock Grid.Column="2" Text="to" 
+                    <TextBlock Text="to" 
                              VerticalAlignment="Center" 
-                             Margin="0,0,15,0"
-                             Foreground="{DynamicResource ForegroundBrush}"/>
+                             Foreground="{DynamicResource ForegroundBrush}"
+                             Margin="0,0,10,0"/>
                     
-                    <DatePicker Grid.Column="3" 
-                              SelectedDate="{Binding EndDate}"
-                              Style="{StaticResource ModernDatePicker}"
-                              Margin="0,0,15,0"/>
+                    <DatePicker SelectedDate="{Binding EndDate, Mode=TwoWay}"
+                             Style="{StaticResource SimpleModernDatePicker}"/>
                     
                     <Button Grid.Column="4" 
                           Content="Apply Filter"

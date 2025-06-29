@@ -153,14 +153,14 @@
                 <DatePicker SelectedDate="{Binding StartDate}" 
                          Margin="10,0,0,0" 
                          Width="120"
-                         Style="{StaticResource ModernDatePicker}"/>
+                         Style="{StaticResource SimpleModernDatePicker}"/>
                 <TextBlock Text="to" 
                          Margin="5,0,5,0" 
                          VerticalAlignment="Center"
                          Foreground="{DynamicResource ForegroundBrush}"/>
                 <DatePicker SelectedDate="{Binding EndDate}" 
                          Width="120"
-                         Style="{StaticResource ModernDatePicker}"/>
+                         Style="{StaticResource SimpleModernDatePicker}"/>
                 <Button Content="Calculate" 
                       Command="{Binding CalculateTotalCommand}" 
                       Margin="10,0,0,0"
